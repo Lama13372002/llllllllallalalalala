@@ -17,14 +17,20 @@ export default function Footer() {
           {/* Company Info */}
           <div className="animate-fade-in">
             <div className="flex items-center mb-4">
-              {/* Всегда используем логотип из файла */}
-              <Image
-                src="/images/footer-logo.png"
-                alt={settings.companyName}
-                width={150}
-                height={40}
-                className="h-10 w-auto object-contain"
-              />
+              <div className="flex items-center">
+                <Image
+                  src="/images/footer-logo.png"
+                  alt={settings.companyName}
+                  width={150}
+                  height={40}
+                  className="h-10 w-auto object-contain mr-2"
+                />
+                <h3 className="text-xl font-bold">
+                  <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-500 to-indigo-600">
+                    {settings.companyName}
+                  </span>
+                </h3>
+              </div>
             </div>
             <p className="text-gray-400 mb-4">
               {settings.companyDesc}

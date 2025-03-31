@@ -119,8 +119,6 @@ model SiteSettings {
   instagramLink String  @default("#")
   telegramLink  String  @default("#")
   whatsappLink  String  @default("#")
-  headerLogoUrl String?
-  footerLogoUrl String?
   updatedAt    DateTime @updatedAt
 }
 

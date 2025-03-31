@@ -3,7 +3,7 @@
 import Link from 'next/link'
 import Image from 'next/image'
 import { useState, useEffect } from 'react'
-import { Menu, X, Phone, MapPin } from 'lucide-react'
+import { Menu, X, Phone } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Dialog, DialogContent, DialogTrigger, DialogTitle } from '@/components/ui/dialog'
 import BookingForm from '@/components/forms/BookingForm'
@@ -49,14 +49,19 @@ export default function Header() {
           href="/"
           className="text-2xl font-bold text-primary flex items-center space-x-2 group"
         >
-          {/* Всегда используем логотип из файла */}
-          <Image
-            src="/images/logo.png"
-            alt={settings.companyName}
-            width={150}
-            height={40}
-            className="h-10 w-auto object-contain"
-          />
+          {/* Логотип и название компании */}
+          <div className="flex items-center">
+            <Image
+              src="/images/logo.png"
+              alt={settings.companyName}
+              width={150}
+              height={40}
+              className="h-10 w-auto object-contain mr-2"
+            />
+            <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-600 to-indigo-700">
+              {settings.companyName}
+            </span>
+          </div>
         </Link>
 
         {/* Desktop Navigation */}

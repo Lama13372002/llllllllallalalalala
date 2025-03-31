@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect, use } from 'react'
+import { useState, useEffect } from 'react'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Textarea } from '@/components/ui/textarea'
@@ -89,25 +89,40 @@ export default function BenefitsList() {
     experience: '',
     support: ''
   })
+  const [benefitsLoaded, setBenefitsLoaded] = useState(false)
 
   // Загрузка данных
   const fetchBenefits = async () => {
     try {
       setLoading(true)
-      const response = await fetch('/api/benefits')
+      const response = await fetch('/api/benefits', {
+        method: 'GET',
+        headers: {
+          'Cache-Control': 'no-cache',
+          'Pragma': 'no-cache'
+        }
+      })
+
+      if (!response.ok) {
+        throw new Error('Ошибка при загрузке преимуществ')
+      }
+
       const data = await response.json()
 
       if (data.benefits) {
-        setBenefits(data.benefits)
+        // Сортируем преимущества по полю order
+        const sortedBenefits = [...data.benefits].sort((a, b) => a.order - b.order)
+        setBenefits(sortedBenefits)
+        setBenefitsLoaded(true)
       }
 
       if (data.stats) {
         setStats(data.stats)
         setStatsForm({
-          clients: data.stats.clients,
-          directions: data.stats.directions,
-          experience: data.stats.experience,
-          support: data.stats.support
+          clients: data.stats.clients || '',
+          directions: data.stats.directions || '',
+          experience: data.stats.experience || '',
+          support: data.stats.support || ''
         })
       }
     } catch (error) {
@@ -119,8 +134,10 @@ export default function BenefitsList() {
   }
 
   useEffect(() => {
-    fetchBenefits()
-  }, [])
+    if (!benefitsLoaded) {
+      fetchBenefits()
+    }
+  }, [benefitsLoaded])
 
   // Обработчик изменения формы
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
@@ -161,8 +178,8 @@ export default function BenefitsList() {
           body: JSON.stringify({
             type: 'benefit',
             id: currentBenefit.id,
-            title: formData.title,
-            description: formData.description,
+            title: formData.title.trim(),
+            description: formData.description.trim(),
             icon: formData.icon
           })
         })
@@ -175,30 +192,37 @@ export default function BenefitsList() {
           },
           body: JSON.stringify({
             type: 'benefit',
-            title: formData.title,
-            description: formData.description,
+            title: formData.title.trim(),
+            description: formData.description.trim(),
             icon: formData.icon
           })
         })
       }
 
-      const data = await response.json()
-
       if (!response.ok) {
-        throw new Error(data.error || 'Что-то пошло не так')
+        const errorText = await response.text()
+        try {
+          const errorData = JSON.parse(errorText)
+          throw new Error(errorData.error || 'Не удалось сохранить преимущество')
+        } catch (parseError) {
+          throw new Error('Ошибка связи с сервером')
+        }
       }
+
+      const data = await response.json()
 
       toast.success(currentBenefit ? 'Преимущество обновлено' : 'Преимущество добавлено')
       setIsModalOpen(false)
       resetForm()
-      fetchBenefits()
+      // Перезагружаем данные после изменений
+      setBenefitsLoaded(false)
     } catch (error) {
       console.error('Error saving benefit:', error)
-      toast.error(
-        currentBenefit
-          ? 'Не удалось обновить преимущество'
-          : 'Не удалось добавить преимущество'
-      )
+      let errorMessage = 'Не удалось сохранить преимущество'
+      if (error instanceof Error) {
+        errorMessage = error.message
+      }
+      toast.error(errorMessage)
     }
   }
 
@@ -214,25 +238,35 @@ export default function BenefitsList() {
         },
         body: JSON.stringify({
           type: 'stats',
-          clients: statsForm.clients,
-          directions: statsForm.directions,
-          experience: statsForm.experience,
-          support: statsForm.support
+          clients: statsForm.clients.trim(),
+          directions: statsForm.directions.trim(),
+          experience: statsForm.experience.trim(),
+          support: statsForm.support.trim()
         })
       })
 
-      const data = await response.json()
-
       if (!response.ok) {
-        throw new Error(data.error || 'Что-то пошло не так')
+        const errorText = await response.text()
+        try {
+          const errorData = JSON.parse(errorText)
+          throw new Error(errorData.error || 'Не удалось обновить статистику')
+        } catch (parseError) {
+          throw new Error('Ошибка связи с сервером')
+        }
       }
+
+      const data = await response.json()
 
       setStats(data.stats)
       setIsStatsDialogOpen(false)
       toast.success('Статистика обновлена')
     } catch (error) {
       console.error('Error updating stats:', error)
-      toast.error('Не удалось обновить статистику')
+      let errorMessage = 'Не удалось обновить статистику'
+      if (error instanceof Error) {
+        errorMessage = error.message
+      }
+      toast.error(errorMessage)
     }
   }
 
@@ -249,15 +283,38 @@ export default function BenefitsList() {
       })
 
       if (!response.ok) {
-        const data = await response.json()
-        throw new Error(data.error || 'Не удалось удалить преимущество')
+        const errorText = await response.text()
+        try {
+          const errorData = JSON.parse(errorText)
+          throw new Error(errorData.error || 'Не удалось удалить преимущество')
+        } catch (parseError) {
+          throw new Error('Ошибка связи с сервером при удалении')
+        }
       }
 
-      toast.success('Преимущество удалено')
-      fetchBenefits()
+      // Получаем ответ от сервера
+      const result = await response.json()
+
+      if (result.success) {
+        toast.success('Преимущество удалено')
+        // Обновляем локальное состояние, удаляя элемент и пересчитывая order
+        setBenefits(prev => {
+          const updatedBenefits = prev.filter(b => b.id !== id)
+            .map((b, index) => ({ ...b, order: index + 1 }))
+          return updatedBenefits
+        })
+      } else {
+        throw new Error(result.error || 'Не удалось удалить преимущество')
+      }
     } catch (error) {
       console.error('Error deleting benefit:', error)
-      toast.error('Не удалось удалить преимущество')
+      let errorMessage = 'Не удалось удалить преимущество'
+      if (error instanceof Error) {
+        errorMessage = error.message
+      }
+      toast.error(errorMessage)
+      // После ошибки перезагружаем данные с сервера
+      setBenefitsLoaded(false)
     } finally {
       setIsDeleting(false)
     }
@@ -278,8 +335,24 @@ export default function BenefitsList() {
     const targetItem = benefits[targetIndex]
 
     try {
-      // Меняем местами порядковые номера
-      await Promise.all([
+      // Оптимистичное обновление UI
+      const updatedBenefits = [...benefits]
+      // Меняем местами элементы
+      updatedBenefits[currentIndex] = { ...targetItem }
+      updatedBenefits[targetIndex] = { ...currentItem }
+
+      // Обновляем порядок
+      updatedBenefits[currentIndex].order = currentIndex + 1
+      updatedBenefits[targetIndex].order = targetIndex + 1
+
+      // Сортируем массив по порядку
+      updatedBenefits.sort((a, b) => a.order - b.order)
+
+      // Обновляем состояние
+      setBenefits(updatedBenefits)
+
+      // Меняем местами порядковые номера на сервере
+      const responses = await Promise.all([
         fetch('/api/benefits', {
           method: 'PUT',
           headers: {
@@ -304,10 +377,17 @@ export default function BenefitsList() {
         })
       ])
 
-      fetchBenefits()
+      // Проверяем, все ли запросы успешны
+      for (const response of responses) {
+        if (!response.ok) {
+          throw new Error('Ошибка при обновлении порядка')
+        }
+      }
     } catch (error) {
       console.error('Error moving benefit:', error)
       toast.error('Не удалось изменить порядок')
+      // В случае ошибки перезагружаем данные с сервера
+      setBenefitsLoaded(false)
     }
   }
 
@@ -383,7 +463,7 @@ export default function BenefitsList() {
                       variant="ghost"
                       size="icon"
                       onClick={() => handleMoveItem(benefit.id, 'up')}
-                      disabled={benefit.order === 1}
+                      disabled={benefit.order === 1 || isDeleting}
                     >
                       <MoveUp className="h-4 w-4" />
                     </Button>
@@ -391,7 +471,7 @@ export default function BenefitsList() {
                       variant="ghost"
                       size="icon"
                       onClick={() => handleMoveItem(benefit.id, 'down')}
-                      disabled={benefit.order === benefits.length}
+                      disabled={benefit.order === benefits.length || isDeleting}
                     >
                       <MoveDown className="h-4 w-4" />
                     </Button>
@@ -399,6 +479,7 @@ export default function BenefitsList() {
                       variant="ghost"
                       size="icon"
                       onClick={() => editBenefit(benefit)}
+                      disabled={isDeleting}
                     >
                       <Edit className="h-4 w-4" />
                     </Button>
@@ -454,7 +535,10 @@ export default function BenefitsList() {
       </Card>
 
       {/* Модальное окно добавления/редактирования преимущества */}
-      <Dialog open={isModalOpen} onOpenChange={setIsModalOpen}>
+      <Dialog open={isModalOpen} onOpenChange={(open) => {
+        setIsModalOpen(open)
+        if (!open) resetForm()
+      }}>
         <DialogContent className="sm:max-w-[500px]">
           <DialogHeader>
             <DialogTitle>

@@ -7,9 +7,25 @@ import { Button } from '@/components/ui/button'
 import { Dialog, DialogContent, DialogTrigger } from '@/components/ui/dialog'
 import { MapPin, Clock, Check } from 'lucide-react'
 import BookingForm from '@/components/forms/BookingForm'
+import { useHomeSettings } from '@/lib/home-settings-context'
+
+// Функция для выбора иконки по названию
+const getIcon = (iconName: string, className: string) => {
+  switch (iconName) {
+    case 'MapPin':
+      return <MapPin className={className} />;
+    case 'Clock':
+      return <Clock className={className} />;
+    case 'Check':
+      return <Check className={className} />;
+    default:
+      return <MapPin className={className} />;
+  }
+};
 
 export default function HeroSection() {
-  const [isBookingOpen, setIsBookingOpen] = useState(false)
+  const { homeSettings } = useHomeSettings();
+  const [isBookingOpen, setIsBookingOpen] = useState(false);
 
   // Function to scroll to routes section
   const scrollToRoutes = () => {
@@ -45,7 +61,7 @@ export default function HeroSection() {
       {/* Background Image and Overlay */}
       <div className="absolute inset-0 z-0">
         <Image
-          src="https://images.unsplash.com/photo-1449965408869-eaa3f722e40d?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=2070&q=80"
+          src={homeSettings.backgroundImageUrl}
           alt="Трансфер"
           fill
           priority
@@ -65,14 +81,14 @@ export default function HeroSection() {
             className="text-4xl md:text-5xl lg:text-6xl font-bold mb-6"
             variants={itemVariants}
           >
-            Комфортные трансферы из Калининграда в Европу
+            {homeSettings.title}
           </motion.h1>
 
           <motion.p
             className="text-xl md:text-2xl mb-8 text-gray-200"
             variants={itemVariants}
           >
-            Безопасные и удобные поездки в города Польши, Германии, Литвы и других стран Европы
+            {homeSettings.subtitle}
           </motion.p>
 
           <motion.div
@@ -101,26 +117,26 @@ export default function HeroSection() {
           >
             <div className="flex flex-col items-center sm:items-start">
               <div className="bg-primary/20 p-3 rounded-full mb-4 animate-float">
-                <MapPin className="w-6 h-6 text-primary" />
+                {getIcon(homeSettings.feature1Icon, "w-6 h-6 text-primary")}
               </div>
-              <h3 className="text-lg font-semibold mb-2">Любые направления</h3>
-              <p className="text-gray-300 text-sm">Поездки в основные города Европы по фиксированным ценам</p>
+              <h3 className="text-lg font-semibold mb-2">{homeSettings.feature1Title}</h3>
+              <p className="text-gray-300 text-sm">{homeSettings.feature1Text}</p>
             </div>
 
             <div className="flex flex-col items-center sm:items-start">
               <div className="bg-primary/20 p-3 rounded-full mb-4 animate-float" style={{ animationDelay: '0.2s' }}>
-                <Clock className="w-6 h-6 text-primary" />
+                {getIcon(homeSettings.feature2Icon, "w-6 h-6 text-primary")}
               </div>
-              <h3 className="text-lg font-semibold mb-2">Круглосуточно</h3>
-              <p className="text-gray-300 text-sm">Работаем 24/7, включая праздники и выходные дни</p>
+              <h3 className="text-lg font-semibold mb-2">{homeSettings.feature2Title}</h3>
+              <p className="text-gray-300 text-sm">{homeSettings.feature2Text}</p>
             </div>
 
             <div className="flex flex-col items-center sm:items-start">
               <div className="bg-primary/20 p-3 rounded-full mb-4 animate-float" style={{ animationDelay: '0.4s' }}>
-                <Check className="w-6 h-6 text-primary" />
+                {getIcon(homeSettings.feature3Icon, "w-6 h-6 text-primary")}
               </div>
-              <h3 className="text-lg font-semibold mb-2">Гарантия качества</h3>
-              <p className="text-gray-300 text-sm">Комфортные автомобили и опытные водители</p>
+              <h3 className="text-lg font-semibold mb-2">{homeSettings.feature3Title}</h3>
+              <p className="text-gray-300 text-sm">{homeSettings.feature3Text}</p>
             </div>
           </motion.div>
         </motion.div>

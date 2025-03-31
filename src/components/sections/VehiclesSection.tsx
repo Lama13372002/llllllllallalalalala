@@ -32,7 +32,7 @@ type DisplayVehicle = {
   seats: number
   description: string
   price: string
-  image: string
+  imageUrl: string | null // Изменено с image на imageUrl для соответствия с БД
   fallbackImage: string
   features: string[]
   isActive: boolean

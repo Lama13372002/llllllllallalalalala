@@ -19,27 +19,61 @@ export default function ContactsSection() {
   })
 
   const [isSubmitting, setIsSubmitting] = useState(false)
+  const [isSuccess, setIsSuccess] = useState(false)
+  const [error, setError] = useState('')
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target
     setFormData(prev => ({ ...prev, [name]: value }))
   }
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     setIsSubmitting(true)
+    setIsSuccess(false)
+    setError('')
 
-    // Имитация отправки формы
-    setTimeout(() => {
-      toast.success('Сообщение успешно отправлено! Мы свяжемся с вами в ближайшее время.')
+    try {
+      // Валидация обязательного поля
+      if (!formData.message.trim()) {
+        setError('Пожалуйста, введите сообщение')
+        toast.error('Пожалуйста, введите сообщение')
+        setIsSubmitting(false)
+        return
+      }
+
+      // Отправка данных в API
+      const response = await fetch('/api/contact-requests', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(formData),
+      })
+
+      const result = await response.json()
+
+      if (!response.ok) {
+        throw new Error(result.error || 'Ошибка при отправке формы')
+      }
+
+      // Очистка формы при успешной отправке
       setFormData({
         name: '',
         email: '',
         phone: '',
         message: ''
       })
+
+      setIsSuccess(true)
+      toast.success('Сообщение успешно отправлено! Мы свяжемся с вами в ближайшее время.')
+    } catch (error) {
+      console.error('Ошибка при отправке формы:', error)
+      setError('Произошла ошибка при отправке формы. Пожалуйста, попробуйте еще раз позже.')
+      toast.error('Ошибка при отправке формы. Пожалуйста, попробуйте еще раз позже.')
+    } finally {
       setIsSubmitting(false)
-    }, 1500)
+    }
   }
 
   return (

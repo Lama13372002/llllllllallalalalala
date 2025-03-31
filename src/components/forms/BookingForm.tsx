@@ -157,6 +157,8 @@ export default function BookingForm() {
   const [mapLoaded, setMapLoaded] = useState(false);
   const [transferConfig, setTransferConfig] = useState<TransferConfig | null>(null);
   const [loadingConfig, setLoadingConfig] = useState(true);
+  const [isSuccess, setIsSuccess] = useState(false);
+  const [error, setError] = useState('');
 
   // Измененная форма с динамическим vehicleClass
   const form = useForm<z.infer<typeof formSchema>>({
@@ -262,17 +264,68 @@ export default function BookingForm() {
     }
   }, [originCity, destinationCity, mapLoaded]);
 
-  function onSubmit(values: z.infer<typeof formSchema>) {
+  // Функция отправки формы
+  const onSubmit = async (data: z.infer<typeof formSchema>) => {
     setIsSubmitting(true);
+    setIsSuccess(false);
+    setError('');
 
-    // В реальном приложении здесь будет отправка данных на сервер
-    console.log(values);
+    try {
+      // Определяем города отправления и прибытия
+      const originCity = data.originCity === 'custom' ? data.customOriginCity : cities.find(c => c.value === data.originCity)?.label;
+      const destinationCity = data.destinationCity === 'custom' ? data.customDestinationCity : cities.find(c => c.value === data.destinationCity)?.label;
 
-    setTimeout(() => {
-      setIsSubmitting(false);
-      toast.success('Заявка успешно отправлена! Мы свяжемся с вами в ближайшее время.');
+      // Создаем данные запроса
+      const requestData = {
+        customerName: data.name,
+        customerPhone: data.phone,
+        vehicleClass: data.vehicleClass,
+        date: data.date,
+        time: data.time,
+        originCity: originCity,
+        originAddress: data.originAddress,
+        destinationCity: destinationCity,
+        destinationAddress: data.tellDriver ? '' : data.destinationAddress,
+        tellDriver: data.tellDriver,
+        paymentMethod: data.paymentMethod,
+        returnTransfer: data.returnTransfer === 'yes',
+        returnDate: data.returnTransfer === 'yes' ? data.returnDate : null,
+        returnTime: data.returnTransfer === 'yes' ? data.returnTime : null,
+        comments: data.comments,
+        vehicleId: vehicleOptions.find(v => v.value === data.vehicleClass)?.vehicleId
+      };
+
+      // Отправляем запрос в API
+      const response = await fetch('/api/transfer-requests', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(requestData),
+      });
+
+      const result = await response.json();
+
+      if (!response.ok) {
+        throw new Error(result.error || 'Ошибка при отправке формы');
+      }
+
+      // Очищаем форму при успешной отправке
       form.reset();
-    }, 1500);
+      setIsSuccess(true);
+      toast.success('Заявка успешно отправлена! Мы свяжемся с вами в ближайшее время.');
+
+      // Закрываем модальное окно после небольшой задержки
+      setTimeout(() => {
+        document.querySelector('[role="dialog"]')?.closest('div[data-state="open"]')?.dispatchEvent(new KeyboardEvent('keydown', {key: 'Escape'}));
+      }, 3000);
+    } catch (error) {
+      console.error('Ошибка при отправке формы:', error);
+      setError('Произошла ошибка при отправке формы. Пожалуйста, попробуйте еще раз позже.');
+      toast.error('Ошибка при отправке формы. Пожалуйста, попробуйте еще раз позже.');
+    } finally {
+      setIsSubmitting(false);
+    }
   }
 
   const vehicleOptions = transferConfig?.vehicles || [];

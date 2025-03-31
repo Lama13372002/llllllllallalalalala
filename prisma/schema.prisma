@@ -132,6 +132,22 @@ model Benefit {
   updatedAt   DateTime  @updatedAt
 }
 
+model SiteSettings {
+  id           Int      @id @default(1)
+  phone        String   @default("+7 (900) 000-00-00")
+  email        String   @default("info@royaltransfer.ru")
+  address      String   @default("г. Калининград, ул. Примерная, д. 123")
+  workingHours String   @default("Пн-Вс: 24/7")
+  companyName  String   @default("RoyalTransfer")
+  companyDesc  String   @default("Комфортные трансферы из Калининграда в города Европы. Безопасность, комфорт и пунктуальность.") @db.Text
+  instagramLink String  @default("#")
+  telegramLink  String  @default("#")
+  whatsappLink  String  @default("#")
+  headerLogoUrl String? 
+  footerLogoUrl String?
+  updatedAt    DateTime @updatedAt
+}
+
 model BenefitStats {
   id           Int      @id @default(1)
   clients      String   @default("5000+")
@@ -139,4 +155,21 @@ model BenefitStats {
   experience   String   @default("10+")
   support      String   @default("24/7")
   updatedAt    DateTime @updatedAt
+}
+
+model HomeSettings {
+  id                Int      @id @default(1)
+  title             String   @default("Комфортные трансферы из Калининграда в Европу")
+  subtitle          String   @default("Безопасные и удобные поездки в города Польши, Германии, Литвы и других стран Европы") @db.Text
+  backgroundImageUrl String?  @default("https://images.unsplash.com/photo-1449965408869-eaa3f722e40d?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=2070&q=80")
+  feature1Title     String   @default("Любые направления") @db.VarChar(100)
+  feature1Text      String   @default("Поездки в основные города Европы по фиксированным ценам") @db.VarChar(255)
+  feature1Icon      String   @default("MapPin") @db.VarChar(50)
+  feature2Title     String   @default("Круглосуточно") @db.VarChar(100)
+  feature2Text      String   @default("Работаем 24/7, включая праздники и выходные дни") @db.VarChar(255)
+  feature2Icon      String   @default("Clock") @db.VarChar(50)
+  feature3Title     String   @default("Гарантия качества") @db.VarChar(100)
+  feature3Text      String   @default("Комфортные автомобили и опытные водители") @db.VarChar(255)
+  feature3Icon      String   @default("Check") @db.VarChar(50)
+  updatedAt         DateTime @updatedAt
 }

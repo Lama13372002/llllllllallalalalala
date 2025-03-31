@@ -11,7 +11,8 @@ import { toast } from 'sonner'
 import BlogPostList from '@/components/forms/BlogPostList'
 import BenefitsList from '@/components/forms/BenefitsList'
 import ReviewsList from '@/components/forms/ReviewsList'
-import { LayoutGrid, FileText, Phone, Mail, Share2, Award, MessageSquare } from 'lucide-react'
+import VehiclesList from '@/components/forms/VehiclesList'
+import { LayoutGrid, FileText, Phone, Mail, Share2, Award, MessageSquare, Car } from 'lucide-react'
 
 export default function AdminPage() {
   const { settings, updateSettings, loading, error } = useSettings()
@@ -90,7 +91,7 @@ export default function AdminPage() {
         </div>
 
         <Tabs defaultValue="contact" className="w-full">
-          <TabsList className="grid w-full grid-cols-7 mb-6">
+          <TabsList className="grid w-full grid-cols-8 mb-6">
             <TabsTrigger value="contact" className="flex items-center">
               <Phone className="h-4 w-4 mr-2" />
               <span className="hidden sm:inline">Контактная информация</span>
@@ -120,6 +121,11 @@ export default function AdminPage() {
               <MessageSquare className="h-4 w-4 mr-2" />
               <span className="hidden sm:inline">Отзывы клиентов</span>
               <span className="sm:hidden">Отзывы</span>
+            </TabsTrigger>
+            <TabsTrigger value="vehicles" className="flex items-center">
+              <Car className="h-4 w-4 mr-2" />
+              <span className="hidden sm:inline">Автопарк</span>
+              <span className="sm:hidden">Авто</span>
             </TabsTrigger>
             <TabsTrigger value="footer" className="flex items-center">
               <Mail className="h-4 w-4 mr-2" />
@@ -326,9 +332,13 @@ export default function AdminPage() {
           <TabsContent value="benefits">
             <BenefitsList />
           </TabsContent>
-          
+
           <TabsContent value="reviews">
             <ReviewsList />
+          </TabsContent>
+
+          <TabsContent value="vehicles">
+            <VehiclesList />
           </TabsContent>
 
           <TabsContent value="footer">

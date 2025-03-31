@@ -153,7 +153,7 @@ export default function VehiclesSection() {
       seats: dbVehicle.seats,
       description: dbVehicle.description || `Комфортабельный автомобиль класса ${vehicleClass}.`,
       price: price,
-      image: dbVehicle.imageUrl || '/images/vehicles/default.jpg',
+      imageUrl: dbVehicle.imageUrl, // Прямое присваивание URL изображения из БД
       fallbackImage: fallbackImage,
       features: features,
       isActive: dbVehicle.isActive
@@ -203,6 +203,13 @@ export default function VehiclesSection() {
   useEffect(() => {
     fetchVehicles()
   }, [])
+
+  // Для отладки - выводим в консоль данные о загруженных транспортных средствах
+  useEffect(() => {
+    if (vehicles.length > 0) {
+      console.log('Loaded vehicles:', vehicles)
+    }
+  }, [vehicles])
 
   // Если данные загружаются, показываем индикатор загрузки
   if (loading) {
@@ -304,10 +311,14 @@ export default function VehiclesSection() {
                       transition={{ duration: 0.5 }}
                     >
                       <div className="relative rounded-lg overflow-hidden shadow-xl group">
+                        {/* Добавляем вывод URL изображения для отладки */}
+                        {/* <div className="absolute top-0 left-0 p-2 bg-black/50 text-white text-xs">
+                          URL: {vehicle.imageUrl || 'Нет изображения'}
+                        </div> */}
                         <div
                           className="aspect-[16/9] bg-cover bg-center relative transition-all duration-700 transform group-hover:scale-105"
                           style={{
-                            backgroundImage: `url(${vehicle.imageUrl ? vehicle.imageUrl : vehicle.fallbackImage})`,
+                            backgroundImage: `url(${vehicle.imageUrl || vehicle.fallbackImage})`,
                             animationDuration: '3s'
                           }}
                         >

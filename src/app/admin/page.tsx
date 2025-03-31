@@ -15,7 +15,9 @@ import ReviewsList from '@/components/forms/ReviewsList'
 import VehiclesList from '@/components/forms/VehiclesList'
 import RoutesList from '@/components/forms/RoutesList'
 import TransferConfigList from '@/components/forms/TransferConfigList'
-import { LayoutGrid, FileText, Phone, Mail, Share2, Award, MessageSquare, Car, Map } from 'lucide-react'
+import LogoSettingsForm from '@/components/forms/LogoSettingsForm'
+import HomeSettingsForm from '@/components/forms/HomeSettingsForm'
+import { LayoutGrid, FileText, Phone, Mail, Share2, Award, MessageSquare, Car, Map, Home, Image as ImageIcon } from 'lucide-react'
 
 // Компонент, который использует useSearchParams и обернут в Suspense
 function AdminContent() {
@@ -118,6 +120,14 @@ function AdminContent() {
             <TabsTrigger value="social" className="flex items-center">
               <Share2 className="w-4 h-4 mr-2" />
               <span>Соцсети</span>
+            </TabsTrigger>
+            <TabsTrigger value="homepage" className="flex items-center">
+              <Home className="w-4 h-4 mr-2" />
+              <span>Главный блок</span>
+            </TabsTrigger>
+            <TabsTrigger value="logos" className="flex items-center">
+              <ImageIcon className="w-4 h-4 mr-2" />
+              <span>Логотипы</span>
             </TabsTrigger>
             <TabsTrigger value="benefits" className="flex items-center">
               <Award className="w-4 h-4 mr-2" />
@@ -358,6 +368,14 @@ function AdminContent() {
 
           <TabsContent value="transfers">
             <TransferConfigList />
+          </TabsContent>
+
+          <TabsContent value="logos">
+            <LogoSettingsForm />
+          </TabsContent>
+
+          <TabsContent value="homepage">
+            <HomeSettingsForm />
           </TabsContent>
 
           <TabsContent value="footer">

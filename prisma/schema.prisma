@@ -63,6 +63,16 @@ model Transfer {
   vehicle        Vehicle?  @relation(fields: [vehicleId], references: [id])
 }
 
+model TransferConfig {
+  id          Int       @id @default(1)
+  title       String    @default("Заказать трансфер")
+  description String    @default("Заполните форму ниже, и мы свяжемся с вами для подтверждения заказа") @db.Text
+  vehicleOptions String? @db.Text  // JSON строка с настройками автомобилей для формы
+  customImageUrls String? @db.Text // JSON строка с URL изображений, если отличаются от основных
+  useVehiclesFromDb Boolean @default(true) // Использовать ли автомобили из базы данных
+  updatedAt    DateTime @updatedAt
+}
+
 model Review {
   id           Int       @id @default(autoincrement())
   customerName String

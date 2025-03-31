@@ -13,8 +13,8 @@ export async function GET() {
     // Если настроек нет, создаем со значениями по умолчанию
     if (!settings) {
       settings = await prisma.siteSettings.create({
-        data: { 
-          id: 1, 
+        data: {
+          id: 1,
           phone: "+7 (900) 000-00-00",
           email: "info@royaltransfer.ru",
           address: "г. Калининград, ул. Примерная, д. 123",
@@ -23,7 +23,9 @@ export async function GET() {
           companyDesc: "Комфортные трансферы из Калининграда в города Европы. Безопасность, комфорт и пунктуальность.",
           instagramLink: "#",
           telegramLink: "#",
-          whatsappLink: "#"
+          whatsappLink: "#",
+          headerLogoUrl: null,
+          footerLogoUrl: null
         }
       })
     }
@@ -39,7 +41,7 @@ export async function GET() {
 export async function POST(request: Request) {
   try {
     const body = await request.json()
-    
+
     // Проверка на наличие хотя бы одного поля для обновления
     if (Object.keys(body).length === 0) {
       return NextResponse.json({ error: 'Необходимо указать хотя бы одно поле для обновления' }, { status: 400 })
@@ -59,7 +61,7 @@ export async function POST(request: Request) {
     } else {
       // Создаем новые настройки с объединением значений по умолчанию и переданных настроек
       const defaultSettings = {
-        id: 1, 
+        id: 1,
         phone: "+7 (900) 000-00-00",
         email: "info@royaltransfer.ru",
         address: "г. Калининград, ул. Примерная, д. 123",
@@ -68,7 +70,9 @@ export async function POST(request: Request) {
         companyDesc: "Комфортные трансферы из Калининграда в города Европы. Безопасность, комфорт и пунктуальность.",
         instagramLink: "#",
         telegramLink: "#",
-        whatsappLink: "#"
+        whatsappLink: "#",
+        headerLogoUrl: null,
+        footerLogoUrl: null
       }
 
       settings = await prisma.siteSettings.create({

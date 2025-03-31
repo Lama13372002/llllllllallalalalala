@@ -1,117 +1,128 @@
 'use client'
 
 import { useState, useEffect } from 'react'
-import { useRouter } from 'next/navigation'
-import { Input } from '@/components/ui/input'
+import { usePathname } from 'next/navigation'
+import Link from 'next/link'
 import { Button } from '@/components/ui/button'
-import { Card, CardHeader, CardTitle, CardContent, CardFooter } from '@/components/ui/card'
-
-// Простой пароль для демонстрации
-const ADMIN_PASSWORD = 'admin123'
+import { LayoutGrid, LogOut, ChevronLeft, Menu, X } from 'lucide-react'
 
 export default function AdminLayout({
   children,
 }: {
   children: React.ReactNode
 }) {
-  const [password, setPassword] = useState('')
-  const [isAuthenticated, setIsAuthenticated] = useState(false)
-  const [error, setError] = useState('')
-  const [isLoading, setIsLoading] = useState(true)
-  const router = useRouter()
+  const [isDrawerOpen, setIsDrawerOpen] = useState(false)
+  const pathname = usePathname()
 
+  // Закрыть меню при переходе на мобильных устройствах
   useEffect(() => {
-    // Проверяем аутентификацию в localStorage
-    const checkAuth = () => {
-      const auth = localStorage.getItem('adminAuth')
-      if (auth === 'true') {
-        setIsAuthenticated(true)
-      }
-      setIsLoading(false)
-    }
-    checkAuth()
-  }, [])
+    setIsDrawerOpen(false)
+  }, [pathname])
 
-  const handleLogin = (e: React.FormEvent) => {
-    e.preventDefault()
-
-    if (password === ADMIN_PASSWORD) {
-      localStorage.setItem('adminAuth', 'true')
-      setIsAuthenticated(true)
-      setError('')
-    } else {
-      setError('Неверный пароль')
-    }
-  }
-
-  const handleLogout = () => {
-    localStorage.removeItem('adminAuth')
-    setIsAuthenticated(false)
-  }
-
-  if (isLoading) {
-    return (
-      <div className="flex justify-center items-center min-h-screen">
-        <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-500"></div>
-      </div>
-    )
-  }
-
-  if (!isAuthenticated) {
-    return (
-      <div className="container mx-auto px-4 py-12">
-        <div className="max-w-md mx-auto">
-          <Card>
-            <CardHeader>
-              <CardTitle>Вход в панель администратора</CardTitle>
-            </CardHeader>
-            <form onSubmit={handleLogin}>
-              <CardContent>
-                <div className="space-y-4">
-                  <div>
-                    <label htmlFor="password" className="block text-sm font-medium text-gray-700 mb-1">
-                      Пароль
-                    </label>
-                    <Input
-                      id="password"
-                      type="password"
-                      value={password}
-                      onChange={(e) => setPassword(e.target.value)}
-                      className="w-full"
-                    />
-                  </div>
-
-                  {error && (
-                    <div className="p-3 rounded bg-red-50 text-red-700 text-sm">
-                      {error}
-                    </div>
-                  )}
-                </div>
-              </CardContent>
-              <CardFooter>
-                <Button
-                  type="submit"
-                  className="w-full"
-                >
-                  Войти
-                </Button>
-              </CardFooter>
-            </form>
-          </Card>
-        </div>
-      </div>
-    )
+  // Обработка клика по затемнению для закрытия меню
+  const handleBackdropClick = () => {
+    setIsDrawerOpen(false)
   }
 
   return (
-    <div>
-      <div className="bg-gray-100 py-4">
-        <div className="container mx-auto px-4 flex justify-between items-center">
-          <h2 className="font-semibold">Панель администратора</h2>
-          <Button variant="outline" onClick={handleLogout}>Выйти</Button>
+    <div className="min-h-screen flex flex-col">
+      {/* Верхняя панель навигации */}
+      <header className="border-b bg-white shadow-sm sticky top-0 z-40">
+        <div className="container mx-auto px-4 h-16 flex items-center justify-between">
+          <div className="flex items-center space-x-4">
+            <Button
+              variant="ghost"
+              size="icon"
+              onClick={() => setIsDrawerOpen(!isDrawerOpen)}
+              className="md:hidden"
+            >
+              {isDrawerOpen ? (
+                <X className="h-5 w-5" />
+              ) : (
+                <Menu className="h-5 w-5" />
+              )}
+            </Button>
+            <Link href="/admin" className="flex items-center space-x-2">
+              <LayoutGrid className="h-6 w-6" />
+              <span className="font-bold">Админ-панель</span>
+            </Link>
+          </div>
+          <div className="flex items-center space-x-2">
+            <Link href="/" passHref>
+              <Button variant="outline" size="sm" className="flex items-center space-x-1">
+                <ChevronLeft className="h-4 w-4" />
+                <span>На сайт</span>
+              </Button>
+            </Link>
+          </div>
         </div>
+      </header>
+
+      <div className="flex flex-grow">
+        {/* Боковая панель навигации - всегда видима на desktop, скрыта на мобильных */}
+        <aside
+          className={`fixed md:relative inset-y-0 left-0 z-30 w-64 transform transition-transform duration-300 ease-in-out bg-gray-50 md:translate-x-0 border-r ${
+            isDrawerOpen ? 'translate-x-0' : '-translate-x-full'
+          }`}
+          style={{ top: '64px', height: 'calc(100vh - 64px)' }}
+        >
+          <div className="h-full overflow-y-auto p-4">
+            <nav className="space-y-1">
+              <Link href="/admin" className="block py-2 px-3 rounded-md hover:bg-gray-200 font-medium">
+                Управление сайтом
+              </Link>
+              <div className="pt-4 pb-2">
+                <span className="px-3 text-xs font-semibold text-gray-500 uppercase tracking-wider">
+                  Редактирование секций
+                </span>
+              </div>
+              <Link href="/admin?tab=contact" className="block py-2 px-3 rounded-md hover:bg-gray-200">
+                Контактная информация
+              </Link>
+              <Link href="/admin?tab=company" className="block py-2 px-3 rounded-md hover:bg-gray-200">
+                О компании
+              </Link>
+              <Link href="/admin?tab=social" className="block py-2 px-3 rounded-md hover:bg-gray-200">
+                Социальные сети
+              </Link>
+              <Link href="/admin?tab=blog" className="block py-2 px-3 rounded-md hover:bg-gray-200">
+                Управление блогом
+              </Link>
+              <Link href="/admin?tab=benefits" className="block py-2 px-3 rounded-md hover:bg-gray-200">
+                Блок преимуществ
+              </Link>
+              <Link href="/admin?tab=reviews" className="block py-2 px-3 rounded-md hover:bg-gray-200">
+                Отзывы клиентов
+              </Link>
+              <Link href="/admin?tab=vehicles" className="block py-2 px-3 rounded-md hover:bg-gray-200">
+                Автопарк
+              </Link>
+              <Link href="/admin?tab=routes" className="block py-2 px-3 rounded-md hover:bg-gray-200">
+                Маршруты
+              </Link>
+              <Link href="/admin?tab=transfers" className="block py-2 px-3 rounded-md hover:bg-gray-200">
+                Модальное окно трансфера
+              </Link>
+              <Link href="/admin?tab=footer" className="block py-2 px-3 rounded-md hover:bg-gray-200">
+                Настройки футера
+              </Link>
+            </nav>
+          </div>
+        </aside>
+
+        {/* Затемнение фона при открытом меню на мобильных */}
+        {isDrawerOpen && (
+          <div
+            className="fixed inset-0 bg-black bg-opacity-30 z-20 md:hidden"
+            onClick={handleBackdropClick}
+          />
+        )}
+
+        {/* Основное содержимое */}
+        <main className="flex-grow overflow-hidden">
+          {children}
+        </main>
       </div>
-      {children}
     </div>
   )
 }

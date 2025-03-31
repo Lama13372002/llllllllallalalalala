@@ -49,22 +49,14 @@ export default function Header() {
           href="/"
           className="text-2xl font-bold text-primary flex items-center space-x-2 group"
         >
-          {settings.headerLogoUrl ? (
-            <Image
-              src={settings.headerLogoUrl}
-              alt={settings.companyName}
-              width={150}
-              height={40}
-              className="h-10 w-auto object-contain"
-            />
-          ) : (
-            <span className="flex items-center animate-pulse">
-              <MapPin className="w-6 h-6 mr-1" />
-              <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-600 to-indigo-700">
-                {settings.companyName}
-              </span>
-            </span>
-          )}
+          {/* Всегда используем логотип из файла */}
+          <Image
+            src="/images/logo.png"
+            alt={settings.companyName}
+            width={150}
+            height={40}
+            className="h-10 w-auto object-contain"
+          />
         </Link>
 
         {/* Desktop Navigation */}
@@ -103,43 +95,51 @@ export default function Header() {
           </Dialog>
         </div>
 
-        {/* Mobile Menu Button */}
-        <button
-          className="md:hidden p-2 text-gray-700 dark:text-gray-200 hover:text-primary"
-          onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-        >
-          {isMobileMenuOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
-        </button>
+        {/* Mobile menu button */}
+        <div className="md:hidden flex items-center">
+          <Button
+            variant="ghost"
+            size="icon"
+            onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
+            aria-label={isMobileMenuOpen ? 'Закрыть меню' : 'Открыть меню'}
+          >
+            {isMobileMenuOpen ? (
+              <X className="h-6 w-6" />
+            ) : (
+              <Menu className="h-6 w-6" />
+            )}
+          </Button>
+        </div>
       </div>
 
-      {/* Mobile Menu */}
+      {/* Mobile Navigation */}
       {isMobileMenuOpen && (
-        <div className="md:hidden bg-white dark:bg-gray-900 shadow-lg animate-fade-in">
-          <nav className="container mx-auto px-4 py-4 flex flex-col">
-            {navLinks.map((link, index) => (
-              <Link
-                key={link.name}
-                href={link.href}
-                className={`nav-link py-3 text-base font-medium text-gray-700 dark:text-gray-200 hover:text-primary border-b border-gray-100 dark:border-gray-800 animate-slide-in-left`}
-                style={{ animationDelay: `${index * 50}ms` }}
-                onClick={() => setIsMobileMenuOpen(false)}
+        <div className="md:hidden bg-white dark:bg-gray-900 shadow-lg">
+          <div className="container mx-auto py-4 px-4">
+            <nav className="flex flex-col space-y-4">
+              {navLinks.map((link) => (
+                <Link
+                  key={link.name}
+                  href={link.href}
+                  className="text-sm font-medium text-gray-700 dark:text-gray-200 hover:text-primary dark:hover:text-primary transition-colors"
+                  onClick={() => setIsMobileMenuOpen(false)}
+                >
+                  {link.name}
+                </Link>
+              ))}
+              <a
+                href={`tel:${settings.phone.replace(/\s+/g, '')}`}
+                className="flex items-center text-sm font-medium text-gray-700 dark:text-gray-200 hover:text-primary dark:hover:text-primary transition-colors"
               >
-                {link.name}
-              </Link>
-            ))}
-            <a
-              href={`tel:${settings.phone.replace(/\s+/g, '')}`}
-              className="flex items-center py-3 text-base font-medium text-gray-700 dark:text-gray-200 hover:text-primary animate-slide-in-left"
-              style={{ animationDelay: `${navLinks.length * 50}ms` }}
-            >
-              <Phone className="w-4 h-4 mr-2" />
-              <span>{settings.phone}</span>
-            </a>
-
-            <div className="pt-4 animate-slide-in-left" style={{ animationDelay: `${(navLinks.length + 1) * 50}ms` }}>
+                <Phone className="w-4 h-4 mr-2" />
+                <span>{settings.phone}</span>
+              </a>
               <Dialog>
                 <DialogTrigger asChild>
-                  <Button className="btn-gradient w-full text-white font-medium">
+                  <Button
+                    className="btn-gradient text-white font-medium w-full"
+                    onClick={() => setIsMobileMenuOpen(false)}
+                  >
                     Заказать трансфер
                   </Button>
                 </DialogTrigger>
@@ -148,8 +148,8 @@ export default function Header() {
                   <BookingForm />
                 </DialogContent>
               </Dialog>
-            </div>
-          </nav>
+            </nav>
+          </div>
         </div>
       )}
     </header>

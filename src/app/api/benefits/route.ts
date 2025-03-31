@@ -149,11 +149,15 @@ export async function DELETE(request: Request) {
     }
 
     // Удаляем преимущество
-    await prisma.benefit.delete({
+    const deletedBenefit = await prisma.benefit.delete({
       where: { id: Number(id) }
     })
 
-    // Пересчитываем порядок для оставшихся элементов
+    if (!deletedBenefit) {
+      return NextResponse.json({ error: 'Преимущество не найдено' }, { status: 404 })
+    }
+
+    // Получаем все оставшиеся преимущества
     const remainingBenefits = await prisma.benefit.findMany({
       orderBy: {
         order: 'asc'
@@ -161,14 +165,17 @@ export async function DELETE(request: Request) {
     })
 
     // Обновляем порядок для оставшихся элементов
-    for (let i = 0; i < remainingBenefits.length; i++) {
-      await prisma.benefit.update({
-        where: { id: remainingBenefits[i].id },
-        data: { order: i + 1 }
-      })
-    }
+    // Используем транзакцию для атомарного обновления всех элементов
+    await prisma.$transaction(
+      remainingBenefits.map((benefit, index) =>
+        prisma.benefit.update({
+          where: { id: benefit.id },
+          data: { order: index + 1 }
+        })
+      )
+    )
 
-    return NextResponse.json({ success: true })
+    return NextResponse.json({ success: true, deletedId: Number(id) })
   } catch (error) {
     console.error('Error deleting benefit:', error)
     return NextResponse.json({ error: 'Не удалось удалить преимущество' }, { status: 500 })

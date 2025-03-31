@@ -1,6 +1,7 @@
 'use client'
 
 import { useState, useEffect } from 'react'
+import { useSearchParams } from 'next/navigation'
 import { useSettings } from '@/lib/settings-context'
 import { Input } from '@/components/ui/input'
 import { Button } from '@/components/ui/button'
@@ -13,10 +14,14 @@ import BenefitsList from '@/components/forms/BenefitsList'
 import ReviewsList from '@/components/forms/ReviewsList'
 import VehiclesList from '@/components/forms/VehiclesList'
 import RoutesList from '@/components/forms/RoutesList'
+import TransferConfigList from '@/components/forms/TransferConfigList'
 import { LayoutGrid, FileText, Phone, Mail, Share2, Award, MessageSquare, Car, Map } from 'lucide-react'
 
 export default function AdminPage() {
   const { settings, updateSettings, loading, error } = useSettings()
+  const searchParams = useSearchParams()
+
+  const [activeTab, setActiveTab] = useState('contact')
   const [formData, setFormData] = useState({
     phone: '',
     email: '',
@@ -29,6 +34,14 @@ export default function AdminPage() {
     whatsappLink: ''
   })
   const [isUpdating, setIsUpdating] = useState(false)
+
+  // Обрабатываем URL параметры при загрузке страницы
+  useEffect(() => {
+    const tab = searchParams.get('tab')
+    if (tab) {
+      setActiveTab(tab)
+    }
+  }, [searchParams])
 
   useEffect(() => {
     // Загружаем данные из контекста настроек в локальное состояние формы
@@ -84,62 +97,14 @@ export default function AdminPage() {
   }
 
   return (
-    <div className="container mx-auto px-4 py-12">
+    <div className="container mx-auto px-4 py-6 md:py-8">
       <div className="max-w-6xl mx-auto">
-        <div className="mb-8 text-center">
-          <h1 className="text-3xl font-bold mb-2">Панель администратора</h1>
+        <div className="mb-6">
+          <h1 className="text-2xl font-bold">Панель администратора</h1>
           <p className="text-gray-600">Управление настройками сайта и контентом</p>
         </div>
 
-        <Tabs defaultValue="contact" className="w-full">
-          <TabsList className="grid w-full grid-cols-9 mb-6">
-            <TabsTrigger value="contact" className="flex items-center">
-              <Phone className="h-4 w-4 mr-2" />
-              <span className="hidden sm:inline">Контактная информация</span>
-              <span className="sm:hidden">Контакты</span>
-            </TabsTrigger>
-            <TabsTrigger value="company" className="flex items-center">
-              <LayoutGrid className="h-4 w-4 mr-2" />
-              <span className="hidden sm:inline">О компании</span>
-              <span className="sm:hidden">Компания</span>
-            </TabsTrigger>
-            <TabsTrigger value="social" className="flex items-center">
-              <Share2 className="h-4 w-4 mr-2" />
-              <span className="hidden sm:inline">Социальные сети</span>
-              <span className="sm:hidden">Соц.сети</span>
-            </TabsTrigger>
-            <TabsTrigger value="blog" className="flex items-center">
-              <FileText className="h-4 w-4 mr-2" />
-              <span className="hidden sm:inline">Управление блогом</span>
-              <span className="sm:hidden">Блог</span>
-            </TabsTrigger>
-            <TabsTrigger value="benefits" className="flex items-center">
-              <Award className="h-4 w-4 mr-2" />
-              <span className="hidden sm:inline">Блок преимуществ</span>
-              <span className="sm:hidden">Преимущества</span>
-            </TabsTrigger>
-            <TabsTrigger value="reviews" className="flex items-center">
-              <MessageSquare className="h-4 w-4 mr-2" />
-              <span className="hidden sm:inline">Отзывы клиентов</span>
-              <span className="sm:hidden">Отзывы</span>
-            </TabsTrigger>
-            <TabsTrigger value="vehicles" className="flex items-center">
-              <Car className="h-4 w-4 mr-2" />
-              <span className="hidden sm:inline">Автопарк</span>
-              <span className="sm:hidden">Авто</span>
-            </TabsTrigger>
-            <TabsTrigger value="routes" className="flex items-center">
-              <Map className="h-4 w-4 mr-2" />
-              <span className="hidden sm:inline">Маршруты</span>
-              <span className="sm:hidden">Маршруты</span>
-            </TabsTrigger>
-            <TabsTrigger value="footer" className="flex items-center">
-              <Mail className="h-4 w-4 mr-2" />
-              <span className="hidden sm:inline">Настройки футера</span>
-              <span className="sm:hidden">Футер</span>
-            </TabsTrigger>
-          </TabsList>
-
+        <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
           <form onSubmit={handleSubmit}>
             <TabsContent value="contact">
               <Card>
@@ -351,6 +316,10 @@ export default function AdminPage() {
             <RoutesList />
           </TabsContent>
 
+          <TabsContent value="transfers">
+            <TransferConfigList />
+          </TabsContent>
+
           <TabsContent value="footer">
             <Card>
               <CardHeader>
@@ -360,11 +329,11 @@ export default function AdminPage() {
                 <p className="text-sm text-gray-600 mb-4">
                   Настройки футера состоят из контактной информации и данных о компании, которые можно изменить на соответствующих вкладках.
                 </p>
-                <div className="flex space-x-2">
-                  <Button variant="outline" onClick={() => document.querySelector('[data-value="contact"]')?.click()}>
+                <div className="flex flex-wrap gap-2">
+                  <Button variant="outline" onClick={() => setActiveTab("contact")}>
                     Редактировать контакты
                   </Button>
-                  <Button variant="outline" onClick={() => document.querySelector('[data-value="company"]')?.click()}>
+                  <Button variant="outline" onClick={() => setActiveTab("company")}>
                     Редактировать информацию о компании
                   </Button>
                 </div>

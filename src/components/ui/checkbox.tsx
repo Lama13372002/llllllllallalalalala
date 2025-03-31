@@ -27,4 +27,7 @@ const Checkbox = React.forwardRef<
 ))
 Checkbox.displayName = CheckboxPrimitive.Root.displayName
 
-export { Checkbox }
+// Экспортируем CheckboxIndicator для использования в других компонентах
+const CheckboxIndicator = CheckboxPrimitive.Indicator
+
+export { Checkbox, CheckboxIndicator }

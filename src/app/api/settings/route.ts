@@ -47,6 +47,18 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: 'Необходимо указать хотя бы одно поле для обновления' }, { status: 400 })
     }
 
+    // Валидация полей логотипов
+    const updatedData = { ...body };
+
+    // Проверка на пустые строки и преобразование их в null
+    if (updatedData.headerLogoUrl !== undefined && (!updatedData.headerLogoUrl || updatedData.headerLogoUrl.trim() === '')) {
+      updatedData.headerLogoUrl = null;
+    }
+
+    if (updatedData.footerLogoUrl !== undefined && (!updatedData.footerLogoUrl || updatedData.footerLogoUrl.trim() === '')) {
+      updatedData.footerLogoUrl = null;
+    }
+
     // Проверяем, существуют ли настройки
     let settings = await prisma.siteSettings.findFirst({
       where: { id: 1 }
@@ -56,7 +68,7 @@ export async function POST(request: Request) {
       // Обновляем существующие настройки
       settings = await prisma.siteSettings.update({
         where: { id: 1 },
-        data: body
+        data: updatedData
       })
     } else {
       // Создаем новые настройки с объединением значений по умолчанию и переданных настроек
@@ -76,7 +88,7 @@ export async function POST(request: Request) {
       }
 
       settings = await prisma.siteSettings.create({
-        data: { ...defaultSettings, ...body }
+        data: { ...defaultSettings, ...updatedData }
       })
     }
 

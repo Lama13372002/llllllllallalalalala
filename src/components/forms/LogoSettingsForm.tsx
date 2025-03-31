@@ -20,6 +20,17 @@ export default function LogoSettingsForm() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
 
+    // Валидация на пустые значения
+    if (headerLogoUrl && !headerLogoUrl.trim()) {
+      toast.error('Введите URL для логотипа шапки')
+      return
+    }
+
+    if (footerLogoUrl && !footerLogoUrl.trim()) {
+      toast.error('Введите URL для логотипа футера')
+      return
+    }
+
     setIsUpdating(true)
     try {
       await updateSettings({
@@ -55,12 +66,12 @@ export default function LogoSettingsForm() {
           <div className="space-y-4">
             <div>
               <label htmlFor="headerLogoUrl" className="block text-sm font-medium text-gray-700 mb-1">
-                URL логотипа в шапке
+                Логотип в шапке
               </label>
               <Input
                 id="headerLogoUrl"
-                type="url"
-                placeholder="https://example.com/logo.png"
+                type="text"
+                placeholder="/images/logo.png"
                 value={headerLogoUrl}
                 onChange={(e) => {
                   setHeaderLogoUrl(e.target.value)
@@ -69,7 +80,7 @@ export default function LogoSettingsForm() {
                 className="w-full"
               />
               <p className="mt-1 text-sm text-gray-500">
-                Введите полный URL изображения логотипа, который будет отображаться в шапке сайта
+                Введите путь к изображению логотипа. Например: /images/logo.png или https://example.com/logo.png
               </p>
 
               {headerLogoUrl && (
@@ -106,12 +117,12 @@ export default function LogoSettingsForm() {
 
             <div className="mt-6">
               <label htmlFor="footerLogoUrl" className="block text-sm font-medium text-gray-700 mb-1">
-                URL логотипа в футере
+                Логотип в футере
               </label>
               <Input
                 id="footerLogoUrl"
-                type="url"
-                placeholder="https://example.com/footer-logo.png"
+                type="text"
+                placeholder="/images/footer-logo.png"
                 value={footerLogoUrl}
                 onChange={(e) => {
                   setFooterLogoUrl(e.target.value)
@@ -120,7 +131,7 @@ export default function LogoSettingsForm() {
                 className="w-full"
               />
               <p className="mt-1 text-sm text-gray-500">
-                Введите полный URL изображения логотипа, который будет отображаться в футере сайта
+                Введите путь к изображению логотипа. Например: /images/footer-logo.png или https://example.com/footer-logo.png
               </p>
 
               {footerLogoUrl && (

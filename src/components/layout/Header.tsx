@@ -1,13 +1,16 @@
 'use client'
 
 import Link from 'next/link'
+import Image from 'next/image'
 import { useState, useEffect } from 'react'
 import { Menu, X, Phone, MapPin } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Dialog, DialogContent, DialogTrigger, DialogTitle } from '@/components/ui/dialog'
 import BookingForm from '@/components/forms/BookingForm'
+import { useSettings } from '@/lib/settings-context'
 
 export default function Header() {
+  const { settings } = useSettings()
   const [isScrolled, setIsScrolled] = useState(false)
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false)
 
@@ -29,6 +32,7 @@ export default function Header() {
     { name: 'Отзывы', href: '/#reviews' },
     { name: 'Блог', href: '/blog' },
     { name: 'Контакты', href: '/#contacts' },
+    { name: 'Политика конфиденциальности', href: '/privacy-policy' },
   ]
 
   return (
@@ -45,17 +49,27 @@ export default function Header() {
           href="/"
           className="text-2xl font-bold text-primary flex items-center space-x-2 group"
         >
-          <span className="flex items-center animate-pulse">
-            <MapPin className="w-6 h-6 mr-1" />
-            <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-600 to-indigo-700">
-              Royal<span className="text-primary">Transfer</span>
+          {settings.headerLogoUrl ? (
+            <Image
+              src={settings.headerLogoUrl}
+              alt={settings.companyName}
+              width={150}
+              height={40}
+              className="h-10 w-auto object-contain"
+            />
+          ) : (
+            <span className="flex items-center animate-pulse">
+              <MapPin className="w-6 h-6 mr-1" />
+              <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-600 to-indigo-700">
+                {settings.companyName}
+              </span>
             </span>
-          </span>
+          )}
         </Link>
 
         {/* Desktop Navigation */}
         <nav className="hidden md:flex items-center space-x-1">
-          {navLinks.map((link) => (
+          {navLinks.slice(0, 7).map((link) => (
             <Link
               key={link.name}
               href={link.href}
@@ -69,11 +83,11 @@ export default function Header() {
         {/* Contact & Book Button */}
         <div className="hidden md:flex items-center space-x-4">
           <a
-            href="tel:+79000000000"
+            href={`tel:${settings.phone.replace(/\s+/g, '')}`}
             className="flex items-center text-sm font-medium text-gray-700 dark:text-gray-200 hover:text-primary dark:hover:text-primary transition-colors"
           >
             <Phone className="w-4 h-4 mr-2 animate-pulse" />
-            <span>+7 (900) 000-00-00</span>
+            <span>{settings.phone}</span>
           </a>
 
           <Dialog>
@@ -114,12 +128,12 @@ export default function Header() {
               </Link>
             ))}
             <a
-              href="tel:+79000000000"
+              href={`tel:${settings.phone.replace(/\s+/g, '')}`}
               className="flex items-center py-3 text-base font-medium text-gray-700 dark:text-gray-200 hover:text-primary animate-slide-in-left"
               style={{ animationDelay: `${navLinks.length * 50}ms` }}
             >
               <Phone className="w-4 h-4 mr-2" />
-              <span>+7 (900) 000-00-00</span>
+              <span>{settings.phone}</span>
             </a>
 
             <div className="pt-4 animate-slide-in-left" style={{ animationDelay: `${(navLinks.length + 1) * 50}ms` }}>

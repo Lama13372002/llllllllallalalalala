@@ -26,19 +26,20 @@ model Route {
 }
 
 model Vehicle {
-  id          Int         @id @default(autoincrement())
-  class       String
-  brand       String
-  model       String
-  year        Int
-  seats       Int
-  description String?     @db.Text
-  imageUrl    String?
-  amenities   String?     @db.Text
-  isActive    Boolean     @default(true)
-  createdAt   DateTime    @default(now())
-  updatedAt   DateTime    @updatedAt
-  transfers   Transfer[]
+  id             Int               @id @default(autoincrement())
+  class          String
+  brand          String
+  model          String
+  year           Int
+  seats          Int
+  description    String?           @db.Text
+  imageUrl       String?
+  amenities      String?           @db.Text
+  isActive       Boolean           @default(true)
+  createdAt      DateTime          @default(now())
+  updatedAt      DateTime          @updatedAt
+  transfers      Transfer[]
+  transferRequests TransferRequest[]
 }
 
 model Transfer {
@@ -61,6 +62,43 @@ model Transfer {
   updatedAt      DateTime  @updatedAt
   route          Route     @relation(fields: [routeId], references: [id])
   vehicle        Vehicle?  @relation(fields: [vehicleId], references: [id])
+}
+
+// Новая модель для заявок на трансфер из формы на сайте
+model TransferRequest {
+  id                  Int       @id @default(autoincrement())
+  customerName        String
+  customerPhone       String
+  vehicleClass        String
+  date                DateTime  @db.Date
+  time                String
+  originCity          String
+  originAddress       String
+  destinationCity     String
+  destinationAddress  String?
+  tellDriver          Boolean   @default(false)
+  paymentMethod       String
+  returnTransfer      Boolean   @default(false)
+  returnDate          DateTime? @db.Date
+  returnTime          String?
+  comments            String?   @db.Text
+  status              String    @default("new")
+  createdAt           DateTime  @default(now())
+  updatedAt           DateTime  @updatedAt
+  vehicleId           Int?
+  vehicle             Vehicle?  @relation(fields: [vehicleId], references: [id])
+}
+
+// Новая модель для заявок из формы обратной связи
+model ContactRequest {
+  id          Int       @id @default(autoincrement())
+  name        String?
+  email       String?
+  phone       String?
+  message     String    @db.Text
+  status      String    @default("new")
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
 }
 
 model TransferConfig {

@@ -15,9 +15,11 @@ import ReviewsList from '@/components/forms/ReviewsList'
 import VehiclesList from '@/components/forms/VehiclesList'
 import RoutesList from '@/components/forms/RoutesList'
 import TransferConfigList from '@/components/forms/TransferConfigList'
+import TransferRequestsList from '@/components/forms/TransferRequestsList'
+import ContactRequestsList from '@/components/forms/ContactRequestsList'
 import LogoSettingsForm from '@/components/forms/LogoSettingsForm'
 import HomeSettingsForm from '@/components/forms/HomeSettingsForm'
-import { LayoutGrid, FileText, Phone, Mail, Share2, Award, MessageSquare, Car, Map, Home, Image as ImageIcon } from 'lucide-react'
+import { LayoutGrid, FileText, Phone, Mail, Share2, Award, MessageSquare, Car, Map, Home, Image as ImageIcon, Inbox, MessageCircle } from 'lucide-react'
 
 // Компонент, который использует useSearchParams и обернут в Suspense
 function AdminContent() {
@@ -151,7 +153,15 @@ function AdminContent() {
             </TabsTrigger>
             <TabsTrigger value="transfers" className="flex items-center">
               <Car className="w-4 h-4 mr-2" />
-              <span>Трансферы</span>
+              <span>Настройки трансфера</span>
+            </TabsTrigger>
+            <TabsTrigger value="transfer-requests" className="flex items-center">
+              <Inbox className="w-4 h-4 mr-2" />
+              <span>Заявки на трансфер</span>
+            </TabsTrigger>
+            <TabsTrigger value="contact-requests" className="flex items-center">
+              <MessageCircle className="w-4 h-4 mr-2" />
+              <span>Заявки со связи</span>
             </TabsTrigger>
           </TabsList>
 
@@ -368,6 +378,14 @@ function AdminContent() {
 
           <TabsContent value="transfers">
             <TransferConfigList />
+          </TabsContent>
+
+          <TabsContent value="transfer-requests">
+            <TransferRequestsList />
+          </TabsContent>
+
+          <TabsContent value="contact-requests">
+            <ContactRequestsList />
           </TabsContent>
 
           <TabsContent value="logos">

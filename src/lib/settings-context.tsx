@@ -13,6 +13,8 @@ type SiteSettings = {
   instagramLink: string
   telegramLink: string
   whatsappLink: string
+  headerLogoUrl: string | null
+  footerLogoUrl: string | null
 }
 
 type SettingsContextType = {
@@ -31,7 +33,9 @@ const defaultSettings: SiteSettings = {
   companyDesc: "Комфортные трансферы из Калининграда в города Европы. Безопасность, комфорт и пунктуальность.",
   instagramLink: "#",
   telegramLink: "#",
-  whatsappLink: "#"
+  whatsappLink: "#",
+  headerLogoUrl: null,
+  footerLogoUrl: null
 }
 
 const SettingsContext = createContext<SettingsContextType | undefined>(undefined)
@@ -58,7 +62,9 @@ export function SettingsProvider({ children }: { children: ReactNode }) {
             companyDesc: data.settings.companyDesc || defaultSettings.companyDesc,
             instagramLink: data.settings.instagramLink || defaultSettings.instagramLink,
             telegramLink: data.settings.telegramLink || defaultSettings.telegramLink,
-            whatsappLink: data.settings.whatsappLink || defaultSettings.whatsappLink
+            whatsappLink: data.settings.whatsappLink || defaultSettings.whatsappLink,
+            headerLogoUrl: data.settings.headerLogoUrl,
+            footerLogoUrl: data.settings.footerLogoUrl
           })
         }
       } catch (err) {

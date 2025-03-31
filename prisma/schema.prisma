@@ -17,6 +17,7 @@ model Route {
   priceBusiness   Float
   priceMinivan    Float
   description     String?     @db.Text
+  imageUrl        String?     // Добавленное поле для URL изображения
   popularityRating Int         @default(1)
   isActive        Boolean     @default(true)
   createdAt       DateTime    @default(now())

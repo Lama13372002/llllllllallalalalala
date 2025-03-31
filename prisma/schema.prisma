@@ -132,22 +132,6 @@ model Benefit {
   updatedAt   DateTime  @updatedAt
 }
 
-model SiteSettings {
-  id           Int      @id @default(1)
-  phone        String   @default("+7 (900) 000-00-00")
-  email        String   @default("info@royaltransfer.ru")
-  address      String   @default("г. Калининград, ул. Примерная, д. 123")
-  workingHours String   @default("Пн-Вс: 24/7")
-  companyName  String   @default("RoyalTransfer")
-  companyDesc  String   @default("Комфортные трансферы из Калининграда в города Европы. Безопасность, комфорт и пунктуальность.") @db.Text
-  instagramLink String  @default("#")
-  telegramLink  String  @default("#")
-  whatsappLink  String  @default("#")
-  headerLogoUrl String? 
-  footerLogoUrl String?
-  updatedAt    DateTime @updatedAt
-}
-
 model BenefitStats {
   id           Int      @id @default(1)
   clients      String   @default("5000+")

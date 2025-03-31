@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, Suspense } from 'react'
 import { useSearchParams } from 'next/navigation'
 import { useSettings } from '@/lib/settings-context'
 import { Input } from '@/components/ui/input'
@@ -17,7 +17,8 @@ import RoutesList from '@/components/forms/RoutesList'
 import TransferConfigList from '@/components/forms/TransferConfigList'
 import { LayoutGrid, FileText, Phone, Mail, Share2, Award, MessageSquare, Car, Map } from 'lucide-react'
 
-export default function AdminPage() {
+// Компонент, который использует useSearchParams и обернут в Suspense
+function AdminContent() {
   const { settings, updateSettings, loading, error } = useSettings()
   const searchParams = useSearchParams()
 
@@ -43,8 +44,8 @@ export default function AdminPage() {
     }
   }, [searchParams])
 
+  // Загружаем данные из контекста настроек в локальное состояние формы
   useEffect(() => {
-    // Загружаем данные из контекста настроек в локальное состояние формы
     if (settings) {
       setFormData({
         phone: settings.phone || '',
@@ -105,6 +106,45 @@ export default function AdminPage() {
         </div>
 
         <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
+          <TabsList className="mb-4 flex flex-wrap">
+            <TabsTrigger value="contact" className="flex items-center">
+              <Phone className="w-4 h-4 mr-2" />
+              <span>Контакты</span>
+            </TabsTrigger>
+            <TabsTrigger value="company" className="flex items-center">
+              <LayoutGrid className="w-4 h-4 mr-2" />
+              <span>О компании</span>
+            </TabsTrigger>
+            <TabsTrigger value="social" className="flex items-center">
+              <Share2 className="w-4 h-4 mr-2" />
+              <span>Соцсети</span>
+            </TabsTrigger>
+            <TabsTrigger value="benefits" className="flex items-center">
+              <Award className="w-4 h-4 mr-2" />
+              <span>Преимущества</span>
+            </TabsTrigger>
+            <TabsTrigger value="reviews" className="flex items-center">
+              <MessageSquare className="w-4 h-4 mr-2" />
+              <span>Отзывы</span>
+            </TabsTrigger>
+            <TabsTrigger value="blog" className="flex items-center">
+              <FileText className="w-4 h-4 mr-2" />
+              <span>Блог</span>
+            </TabsTrigger>
+            <TabsTrigger value="vehicles" className="flex items-center">
+              <Car className="w-4 h-4 mr-2" />
+              <span>Автомобили</span>
+            </TabsTrigger>
+            <TabsTrigger value="routes" className="flex items-center">
+              <Map className="w-4 h-4 mr-2" />
+              <span>Маршруты</span>
+            </TabsTrigger>
+            <TabsTrigger value="transfers" className="flex items-center">
+              <Car className="w-4 h-4 mr-2" />
+              <span>Трансферы</span>
+            </TabsTrigger>
+          </TabsList>
+
           <form onSubmit={handleSubmit}>
             <TabsContent value="contact">
               <Card>
@@ -349,5 +389,20 @@ export default function AdminPage() {
         )}
       </div>
     </div>
+  )
+}
+
+// Основной компонент страницы администратора
+export default function AdminPage() {
+  return (
+    <Suspense fallback={
+      <div className="container mx-auto px-4 py-12">
+        <div className="flex justify-center items-center min-h-[300px]">
+          <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-500"></div>
+        </div>
+      </div>
+    }>
+      <AdminContent />
+    </Suspense>
   )
 }

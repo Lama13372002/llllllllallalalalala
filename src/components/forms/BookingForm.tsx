@@ -37,6 +37,25 @@ import { Checkbox } from '@/components/ui/checkbox'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { MapView } from '@/components/ui/map-view'
 
+// Тип для транспортного средства в форме
+type VehicleOption = {
+  value: string
+  label: string
+  price: string
+  image?: string
+  desc: string
+  vehicleId?: number
+}
+
+// Тип для конфигурации трансфера
+type TransferConfig = {
+  id: number
+  title: string
+  description: string
+  vehicles: VehicleOption[]
+  useVehiclesFromDb: boolean
+}
+
 // Список доступных городов для выбора
 const cities = [
   { value: 'kaliningrad', label: 'Калининград' },
@@ -56,7 +75,7 @@ const formSchema = z.object({
   phone: z.string().min(10, {
     message: 'Укажите корректный номер телефона',
   }),
-  vehicleClass: z.enum(['standard', 'comfort', 'business', 'premium', 'minivan'], {
+  vehicleClass: z.string({
     required_error: 'Выберите класс автомобиля',
   }),
   date: z.date({
@@ -136,13 +155,16 @@ export default function BookingForm() {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [showMap, setShowMap] = useState(false);
   const [mapLoaded, setMapLoaded] = useState(false);
+  const [transferConfig, setTransferConfig] = useState<TransferConfig | null>(null);
+  const [loadingConfig, setLoadingConfig] = useState(true);
 
+  // Измененная форма с динамическим vehicleClass
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
       name: '',
       phone: '',
-      vehicleClass: 'standard',
+      vehicleClass: '',
       date: null,
       time: '',
       originCity: 'kaliningrad',
@@ -159,6 +181,32 @@ export default function BookingForm() {
       agreement: false,
     },
   })
+
+  // Загрузка конфигурации трансфера
+  useEffect(() => {
+    const fetchTransferConfig = async () => {
+      try {
+        setLoadingConfig(true)
+        const response = await fetch('/api/transfers')
+        const data = await response.json()
+
+        if (data.config) {
+          setTransferConfig(data.config)
+
+          // Если есть автомобили, устанавливаем первый как значение по умолчанию
+          if (data.config.vehicles && data.config.vehicles.length > 0) {
+            form.setValue('vehicleClass', data.config.vehicles[0].value)
+          }
+        }
+      } catch (error) {
+        console.error('Error fetching transfer config:', error)
+      } finally {
+        setLoadingConfig(false)
+      }
+    }
+
+    fetchTransferConfig()
+  }, [form])
 
   // Загрузка Google Maps API при монтировании компонента
   useEffect(() => {
@@ -227,48 +275,21 @@ export default function BookingForm() {
     }, 1500);
   }
 
-  const vehicleOptions = [
-    {
-      value: 'standard',
-      label: 'Standart',
-      price: 'от 250.00 EUR',
-      image: '/images/vehicles/standard.jpg',
-      desc: 'Ford Focus, Honda Civic, Toyota Corolla и похожие'
-    },
-    {
-      value: 'comfort',
-      label: 'Comfort',
-      price: 'от 250.00 EUR',
-      image: '/images/vehicles/comfort.jpg',
-      desc: 'Toyota Camry, Mercedes Benz C class, BMW 2 Series Gran Tourer и похожие'
-    },
-    {
-      value: 'business',
-      label: 'Business',
-      price: 'от 350.00 EUR',
-      image: '/images/vehicles/business.jpg',
-      desc: 'Mercedes Benz E class, BMW 5 Series, Audi A6, Lexus ES'
-    },
-    {
-      value: 'premium',
-      label: 'VIP',
-      price: 'от 500.00 EUR',
-      image: '/images/vehicles/premium.jpg',
-      desc: 'Lexus 450'
-    },
-    {
-      value: 'minivan',
-      label: 'Minivan',
-      price: 'от 500.00 EUR',
-      image: '/images/vehicles/minivan.jpg',
-      desc: 'Mercedes Benz V class'
-    },
-  ]
+  const vehicleOptions = transferConfig?.vehicles || [];
+
+  // Показываем индикатор загрузки, пока настройки загружаются
+  if (loadingConfig) {
+    return (
+      <div className="flex justify-center items-center min-h-[300px]">
+        <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-500"></div>
+      </div>
+    );
+  }
 
   return (
     <div className="relative max-h-[90vh] overflow-y-auto">
       <div className="sticky top-0 bg-white dark:bg-gray-950 z-10 p-4 flex items-center justify-between border-b">
-        <h2 className="text-xl font-bold">Заказать трансфер</h2>
+        <h2 className="text-xl font-bold">{transferConfig?.title || 'Заказать трансфер'}</h2>
         <Button
           variant="ghost"
           size="icon"
@@ -282,7 +303,7 @@ export default function BookingForm() {
 
       <div className="p-6">
         <p className="text-muted-foreground mb-6">
-          Заполните форму ниже, и мы свяжемся с вами для подтверждения заказа
+          {transferConfig?.description || 'Заполните форму ниже, и мы свяжемся с вами для подтверждения заказа'}
         </p>
 
         {/* Компонент мини-карты */}

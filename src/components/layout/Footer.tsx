@@ -1,6 +1,7 @@
 'use client'
 
 import Link from 'next/link'
+import Image from 'next/image'
 import { MapPin, Phone, Mail, Clock } from 'lucide-react'
 import { FaInstagram, FaTelegram, FaWhatsapp } from 'react-icons/fa'
 import { useSettings } from '@/lib/settings-context'
@@ -8,7 +9,7 @@ import { useSettings } from '@/lib/settings-context'
 export default function Footer() {
   const currentYear = new Date().getFullYear()
   const { settings } = useSettings()
-  
+
   return (
     <footer className="bg-gray-900 text-white pt-16 pb-8">
       <div className="container mx-auto px-4">
@@ -16,12 +17,24 @@ export default function Footer() {
           {/* Company Info */}
           <div className="animate-fade-in">
             <div className="flex items-center mb-4">
-              <MapPin className="w-6 h-6 mr-2 text-primary" />
-              <h3 className="text-xl font-bold">
-                <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-500 to-indigo-600">
-                  {settings.companyName}
-                </span>
-              </h3>
+              {settings.footerLogoUrl ? (
+                <Image
+                  src={settings.footerLogoUrl}
+                  alt={settings.companyName}
+                  width={150}
+                  height={40}
+                  className="h-10 w-auto object-contain"
+                />
+              ) : (
+                <>
+                  <MapPin className="w-6 h-6 mr-2 text-primary" />
+                  <h3 className="text-xl font-bold">
+                    <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-500 to-indigo-600">
+                      {settings.companyName}
+                    </span>
+                  </h3>
+                </>
+              )}
             </div>
             <p className="text-gray-400 mb-4">
               {settings.companyDesc}
@@ -31,7 +44,7 @@ export default function Footer() {
                 href={settings.instagramLink}
                 className="bg-pink-600 hover:bg-pink-700 p-2 rounded-full transition-colors"
                 aria-label="Instagram"
-                target="_blank" 
+                target="_blank"
                 rel="noopener noreferrer"
               >
                 <FaInstagram className="w-5 h-5" />
@@ -40,7 +53,7 @@ export default function Footer() {
                 href={settings.telegramLink}
                 className="bg-blue-500 hover:bg-blue-600 p-2 rounded-full transition-colors"
                 aria-label="Telegram"
-                target="_blank" 
+                target="_blank"
                 rel="noopener noreferrer"
               >
                 <FaTelegram className="w-5 h-5" />
@@ -49,7 +62,7 @@ export default function Footer() {
                 href={settings.whatsappLink}
                 className="bg-green-500 hover:bg-green-600 p-2 rounded-full transition-colors"
                 aria-label="WhatsApp"
-                target="_blank" 
+                target="_blank"
                 rel="noopener noreferrer"
               >
                 <FaWhatsapp className="w-5 h-5" />
@@ -81,6 +94,11 @@ export default function Footer() {
               </li>
               <li>
                 <Link href="/#contacts" className="text-gray-400 hover:text-primary transition-colors">Контакты</Link>
+              </li>
+              <li>
+                <Link href="/privacy-policy" className="text-gray-400 hover:text-primary transition-colors">
+                  Политика конфиденциальности
+                </Link>
               </li>
             </ul>
           </div>
@@ -132,8 +150,8 @@ export default function Footer() {
               </li>
               <li className="flex items-center">
                 <Phone className="w-5 h-5 text-primary mr-3" />
-                <a 
-                  href={`tel:${settings.phone.replace(/\s+/g, '')}`} 
+                <a
+                  href={`tel:${settings.phone.replace(/\s+/g, '')}`}
                   className="text-gray-400 hover:text-primary transition-colors"
                 >
                   {settings.phone}
@@ -141,8 +159,8 @@ export default function Footer() {
               </li>
               <li className="flex items-center">
                 <Mail className="w-5 h-5 text-primary mr-3" />
-                <a 
-                  href={`mailto:${settings.email}`} 
+                <a
+                  href={`mailto:${settings.email}`}
                   className="text-gray-400 hover:text-primary transition-colors"
                 >
                   {settings.email}

@@ -1,0 +1,131 @@
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+model Route {
+  id              Int         @id @default(autoincrement())
+  originCity      String
+  destinationCity String
+  distance        Float
+  estimatedTime   String
+  priceComfort    Float
+  priceBusiness   Float
+  priceMinivan    Float
+  description     String?     @db.Text
+  popularityRating Int         @default(1)
+  isActive        Boolean     @default(true)
+  createdAt       DateTime    @default(now())
+  updatedAt       DateTime    @updatedAt
+  transfers       Transfer[]
+}
+
+model Vehicle {
+  id          Int         @id @default(autoincrement())
+  class       String
+  brand       String
+  model       String
+  year        Int
+  seats       Int
+  description String?     @db.Text
+  imageUrl    String?
+  amenities   String?     @db.Text
+  isActive    Boolean     @default(true)
+  createdAt   DateTime    @default(now())
+  updatedAt   DateTime    @updatedAt
+  transfers   Transfer[]
+}
+
+model Transfer {
+  id             Int       @id @default(autoincrement())
+  routeId        Int
+  vehicleId      Int?
+  vehicleClass   String
+  customerName   String
+  customerPhone  String
+  date           DateTime  @db.Date
+  time           String
+  origin         String
+  destination    String
+  paymentMethod  String
+  returnTransfer Boolean   @default(false)
+  comments       String?   @db.Text
+  status         String    @default("pending")
+  price          Float
+  createdAt      DateTime  @default(now())
+  updatedAt      DateTime  @updatedAt
+  route          Route     @relation(fields: [routeId], references: [id])
+  vehicle        Vehicle?  @relation(fields: [vehicleId], references: [id])
+}
+
+model Review {
+  id           Int       @id @default(autoincrement())
+  customerName String
+  rating       Int
+  comment      String    @db.Text
+  imageUrl     String?
+  isPublished  Boolean   @default(true)
+  createdAt    DateTime  @default(now())
+  updatedAt    DateTime  @updatedAt
+}
+
+model BlogPost {
+  id          Int       @id @default(autoincrement())
+  title       String
+  slug        String    @unique
+  content     String    @db.Text
+  imageUrl    String?
+  excerpt     String?   @db.Text
+  isPublished Boolean   @default(true)
+  publishedAt DateTime?
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+}
+
+model Contact {
+  id        Int       @id @default(autoincrement())
+  name      String?
+  email     String?
+  phone     String?
+  message   String    @db.Text
+  isRead    Boolean   @default(false)
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+}
+
+model SiteSettings {
+  id           Int      @id @default(1)
+  phone        String   @default("+7 (900) 000-00-00")
+  email        String   @default("info@royaltransfer.ru")
+  address      String   @default("г. Калининград, ул. Примерная, д. 123")
+  workingHours String   @default("Пн-Вс: 24/7")
+  companyName  String   @default("RoyalTransfer")
+  companyDesc  String   @default("Комфортные трансферы из Калининграда в города Европы. Безопасность, комфорт и пунктуальность.") @db.Text
+  instagramLink String  @default("#")
+  telegramLink  String  @default("#")
+  whatsappLink  String  @default("#")
+  updatedAt    DateTime @updatedAt
+}
+
+model Benefit {
+  id          Int       @id @default(autoincrement())
+  title       String
+  description String    @db.Text
+  icon        String
+  order       Int       @default(0)
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+}
+
+model BenefitStats {
+  id           Int      @id @default(1)
+  clients      String   @default("5000+")
+  directions   String   @default("15+")
+  experience   String   @default("10+")
+  support      String   @default("24/7")
+  updatedAt    DateTime @updatedAt
+}

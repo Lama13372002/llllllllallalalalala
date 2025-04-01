@@ -110,60 +110,62 @@ function AdminContent() {
         </div>
 
         <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-          <TabsList className="mb-4 flex flex-wrap">
-            <TabsTrigger value="contact" className="flex items-center">
-              <Phone className="w-4 h-4 mr-2" />
-              <span>Контакты</span>
-            </TabsTrigger>
-            <TabsTrigger value="company" className="flex items-center">
-              <LayoutGrid className="w-4 h-4 mr-2" />
-              <span>О компании</span>
-            </TabsTrigger>
-            <TabsTrigger value="social" className="flex items-center">
-              <Share2 className="w-4 h-4 mr-2" />
-              <span>Соцсети</span>
-            </TabsTrigger>
-            <TabsTrigger value="homepage" className="flex items-center">
-              <Home className="w-4 h-4 mr-2" />
-              <span>Главный блок</span>
-            </TabsTrigger>
-            <TabsTrigger value="logos" className="flex items-center">
-              <ImageIcon className="w-4 h-4 mr-2" />
-              <span>Логотипы</span>
-            </TabsTrigger>
-            <TabsTrigger value="benefits" className="flex items-center">
-              <Award className="w-4 h-4 mr-2" />
-              <span>Преимущества</span>
-            </TabsTrigger>
-            <TabsTrigger value="reviews" className="flex items-center">
-              <MessageSquare className="w-4 h-4 mr-2" />
-              <span>Отзывы</span>
-            </TabsTrigger>
-            <TabsTrigger value="blog" className="flex items-center">
-              <FileText className="w-4 h-4 mr-2" />
-              <span>Блог</span>
-            </TabsTrigger>
-            <TabsTrigger value="vehicles" className="flex items-center">
-              <Car className="w-4 h-4 mr-2" />
-              <span>Автомобили</span>
-            </TabsTrigger>
-            <TabsTrigger value="routes" className="flex items-center">
-              <Map className="w-4 h-4 mr-2" />
-              <span>Маршруты</span>
-            </TabsTrigger>
-            <TabsTrigger value="transfers" className="flex items-center">
-              <Car className="w-4 h-4 mr-2" />
-              <span>Настройки трансфера</span>
-            </TabsTrigger>
-            <TabsTrigger value="transfer-requests" className="flex items-center">
-              <Inbox className="w-4 h-4 mr-2" />
-              <span>Заявки на трансфер</span>
-            </TabsTrigger>
-            <TabsTrigger value="contact-requests" className="flex items-center">
-              <MessageCircle className="w-4 h-4 mr-2" />
-              <span>Заявки со связи</span>
-            </TabsTrigger>
-          </TabsList>
+          <div className="overflow-x-auto pb-2 -mx-4 px-4">
+            <TabsList className="mb-4 flex flex-nowrap min-w-max">
+              <TabsTrigger value="contact" className="flex items-center text-xs sm:text-sm py-1.5 sm:py-2 px-2 sm:px-3">
+                <Phone className="w-3 h-3 sm:w-4 sm:h-4 mr-1 sm:mr-2 flex-shrink-0" />
+                <span>Контакты</span>
+              </TabsTrigger>
+              <TabsTrigger value="company" className="flex items-center text-xs sm:text-sm py-1.5 sm:py-2 px-2 sm:px-3">
+                <LayoutGrid className="w-3 h-3 sm:w-4 sm:h-4 mr-1 sm:mr-2 flex-shrink-0" />
+                <span>О компании</span>
+              </TabsTrigger>
+              <TabsTrigger value="social" className="flex items-center text-xs sm:text-sm py-1.5 sm:py-2 px-2 sm:px-3">
+                <Share2 className="w-3 h-3 sm:w-4 sm:h-4 mr-1 sm:mr-2 flex-shrink-0" />
+                <span>Соцсети</span>
+              </TabsTrigger>
+              <TabsTrigger value="homepage" className="flex items-center text-xs sm:text-sm py-1.5 sm:py-2 px-2 sm:px-3">
+                <Home className="w-3 h-3 sm:w-4 sm:h-4 mr-1 sm:mr-2 flex-shrink-0" />
+                <span>Главный блок</span>
+              </TabsTrigger>
+              <TabsTrigger value="logos" className="flex items-center text-xs sm:text-sm py-1.5 sm:py-2 px-2 sm:px-3">
+                <ImageIcon className="w-3 h-3 sm:w-4 sm:h-4 mr-1 sm:mr-2 flex-shrink-0" />
+                <span>Логотипы</span>
+              </TabsTrigger>
+              <TabsTrigger value="benefits" className="flex items-center text-xs sm:text-sm py-1.5 sm:py-2 px-2 sm:px-3">
+                <Award className="w-3 h-3 sm:w-4 sm:h-4 mr-1 sm:mr-2 flex-shrink-0" />
+                <span>Преимущества</span>
+              </TabsTrigger>
+              <TabsTrigger value="reviews" className="flex items-center text-xs sm:text-sm py-1.5 sm:py-2 px-2 sm:px-3">
+                <MessageSquare className="w-3 h-3 sm:w-4 sm:h-4 mr-1 sm:mr-2 flex-shrink-0" />
+                <span>Отзывы</span>
+              </TabsTrigger>
+              <TabsTrigger value="blog" className="flex items-center text-xs sm:text-sm py-1.5 sm:py-2 px-2 sm:px-3">
+                <FileText className="w-3 h-3 sm:w-4 sm:h-4 mr-1 sm:mr-2 flex-shrink-0" />
+                <span>Блог</span>
+              </TabsTrigger>
+              <TabsTrigger value="vehicles" className="flex items-center text-xs sm:text-sm py-1.5 sm:py-2 px-2 sm:px-3">
+                <Car className="w-3 h-3 sm:w-4 sm:h-4 mr-1 sm:mr-2 flex-shrink-0" />
+                <span>Автомобили</span>
+              </TabsTrigger>
+              <TabsTrigger value="routes" className="flex items-center text-xs sm:text-sm py-1.5 sm:py-2 px-2 sm:px-3">
+                <Map className="w-3 h-3 sm:w-4 sm:h-4 mr-1 sm:mr-2 flex-shrink-0" />
+                <span>Маршруты</span>
+              </TabsTrigger>
+              <TabsTrigger value="transfers" className="flex items-center text-xs sm:text-sm py-1.5 sm:py-2 px-2 sm:px-3">
+                <Car className="w-3 h-3 sm:w-4 sm:h-4 mr-1 sm:mr-2 flex-shrink-0" />
+                <span>Настройки трансфера</span>
+              </TabsTrigger>
+              <TabsTrigger value="transfer-requests" className="flex items-center text-xs sm:text-sm py-1.5 sm:py-2 px-2 sm:px-3">
+                <Inbox className="w-3 h-3 sm:w-4 sm:h-4 mr-1 sm:mr-2 flex-shrink-0" />
+                <span>Заявки на трансфер</span>
+              </TabsTrigger>
+              <TabsTrigger value="contact-requests" className="flex items-center text-xs sm:text-sm py-1.5 sm:py-2 px-2 sm:px-3">
+                <MessageCircle className="w-3 h-3 sm:w-4 sm:h-4 mr-1 sm:mr-2 flex-shrink-0" />
+                <span>Заявки со связи</span>
+              </TabsTrigger>
+            </TabsList>
+          </div>
 
           <form onSubmit={handleSubmit}>
             <TabsContent value="contact">

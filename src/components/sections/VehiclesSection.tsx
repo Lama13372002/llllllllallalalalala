@@ -369,7 +369,7 @@ export default function VehiclesSection() {
                             <DialogTrigger asChild>
                               <Button className="w-full sm:w-auto btn-gradient relative group overflow-hidden rounded-full font-medium transition-all px-8 py-6 vehicle-order-button">
                                 <span className="relative z-10 flex items-center justify-center gap-2">
-                                  <span>Заказать трансфер</span>
+                                  <span>Выбрать класс</span>
                                   <ChevronRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
                                 </span>
                                 <span className="absolute inset-0 bg-white/20 transform translate-y-full group-hover:translate-y-0 transition-transform duration-300"></span>

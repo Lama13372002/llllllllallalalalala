@@ -27,14 +27,6 @@ export default function HeroSection() {
   const { homeSettings } = useHomeSettings();
   const [isBookingOpen, setIsBookingOpen] = useState(false);
 
-  // Function to scroll to routes section
-  const scrollToRoutes = () => {
-    const routesSection = document.getElementById('routes')
-    if (routesSection) {
-      routesSection.scrollIntoView({ behavior: 'smooth' })
-    }
-  }
-
   // Animation variants
   const containerVariants = {
     hidden: { opacity: 0 },
@@ -105,10 +97,6 @@ export default function HeroSection() {
                 <BookingForm />
               </DialogContent>
             </Dialog>
-
-            <Button variant="outline" size="lg" className="border-white text-white hover:bg-white hover:text-gray-900 transition-colors text-lg font-medium" onClick={scrollToRoutes}>
-              Посмотреть маршруты
-            </Button>
           </motion.div>
 
           <motion.div

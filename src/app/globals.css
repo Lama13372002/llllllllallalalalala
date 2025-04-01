@@ -774,6 +774,14 @@ input[type="time"] {
   width: 100%;
 }
 
+/* Скрываем нативный календарный виджет и иконки даты/времени для всех устройств */
+input[type="date"]::-webkit-calendar-picker-indicator,
+input[type="time"]::-webkit-calendar-picker-indicator,
+input[type="time"]::-webkit-time-picker-indicator {
+  display: none;
+  opacity: 0;
+}
+
 /* Стили для iOS */
 @supports (-webkit-touch-callout: none) {
   /* Общие стили для полей ввода */
@@ -788,28 +796,14 @@ input[type="time"] {
   input[type="date"]::-webkit-date-and-time-value {
     text-align: left;
   }
-
-  /* Скрываем нативный календарный виджет iOS и показываем иконку */
-  input[type="date"]::-webkit-calendar-picker-indicator,
-  input[type="time"]::-webkit-calendar-picker-indicator,
-  input[type="time"]::-webkit-time-picker-indicator {
-    background-position: right center;
-    background-size: 20px;
-    position: absolute;
-    right: 8px;
-    top: 50%;
-    transform: translateY(-50%);
-    margin: 0;
-  }
 }
 
-/* Стили для Android и других устройств */
+/* Стили для Android и других устройств - удаляем отображение иконок */
 @supports not (-webkit-touch-callout: none) {
   input[type="date"]::-webkit-calendar-picker-indicator,
   input[type="time"]::-webkit-calendar-picker-indicator {
-    background-position: right center;
-    background-size: 20px;
-    margin-right: 0;
+    display: none;
+    opacity: 0;
   }
 }
 

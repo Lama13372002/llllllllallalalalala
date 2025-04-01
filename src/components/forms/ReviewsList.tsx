@@ -20,7 +20,9 @@ import {
   Star,
   StarOff,
   User,
-  ExternalLink
+  ExternalLink,
+  Check,
+  ThumbsUp
 } from 'lucide-react'
 import {
   Dialog,
@@ -40,7 +42,10 @@ interface Review {
   rating: number
   comment: string
   imageUrl: string | null
+  reviewImageUrl: string | null
+  videoUrl: string | null
   isPublished: boolean
+  isApproved: boolean
   createdAt: string
   updatedAt: string
 }
@@ -65,7 +70,10 @@ export default function ReviewsList() {
     rating: 5,
     comment: '',
     imageUrl: '',
-    isPublished: true
+    reviewImageUrl: '',
+    videoUrl: '',
+    isPublished: true,
+    isApproved: false,
   })
 
   // Состояние для операций
@@ -113,6 +121,11 @@ export default function ReviewsList() {
     setFormData(prev => ({ ...prev, isPublished }))
   }
 
+  // Обработка изменения статуса одобрения
+  const handleApprovedChange = (isApproved: boolean) => {
+    setFormData(prev => ({ ...prev, isApproved, isPublished: isApproved })) // Если одобрен, то автоматически публикуем
+  }
+
   // Открытие диалога для создания отзыва
   const openCreateDialog = () => {
     setFormData({
@@ -120,7 +133,10 @@ export default function ReviewsList() {
       rating: 5,
       comment: '',
       imageUrl: '',
-      isPublished: true
+      reviewImageUrl: '',
+      videoUrl: '',
+      isPublished: true,
+      isApproved: false,
     })
     setIsCreateDialogOpen(true)
   }
@@ -133,7 +149,10 @@ export default function ReviewsList() {
       rating: review.rating,
       comment: review.comment,
       imageUrl: review.imageUrl || '',
-      isPublished: review.isPublished
+      reviewImageUrl: review.reviewImageUrl || '',
+      videoUrl: review.videoUrl || '',
+      isPublished: review.isPublished,
+      isApproved: review.isApproved,
     })
     setIsEditDialogOpen(true)
   }
@@ -163,7 +182,10 @@ export default function ReviewsList() {
           rating: formData.rating,
           comment: formData.comment,
           imageUrl: formData.imageUrl || null,
-          isPublished: formData.isPublished
+          reviewImageUrl: formData.reviewImageUrl || null,
+          videoUrl: formData.videoUrl || null,
+          isPublished: formData.isPublished,
+          isApproved: formData.isApproved,
         })
       })
 
@@ -203,7 +225,10 @@ export default function ReviewsList() {
           rating: formData.rating,
           comment: formData.comment,
           imageUrl: formData.imageUrl || null,
-          isPublished: formData.isPublished
+          reviewImageUrl: formData.reviewImageUrl || null,
+          videoUrl: formData.videoUrl || null,
+          isPublished: formData.isPublished,
+          isApproved: formData.isApproved,
         })
       })
 
@@ -242,6 +267,34 @@ export default function ReviewsList() {
     } catch (err) {
       console.error('Error deleting review:', err)
       toast.error('Не удалось удалить отзыв')
+    } finally {
+      setIsSubmitting(false)
+    }
+  }
+
+  // Одобрение отзыва (без открытия диалога редактирования)
+  const approveReview = async (review: Review) => {
+    setIsSubmitting(true)
+    try {
+      const response = await fetch(`/api/reviews?id=${review.id}`, {
+        method: 'PATCH',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          approved: true
+        })
+      })
+
+      if (!response.ok) {
+        throw new Error('Failed to approve review')
+      }
+
+      await fetchReviews()
+      toast.success('Отзыв успешно одобрен и опубликован')
+    } catch (err) {
+      console.error('Error approving review:', err)
+      toast.error('Не удалось одобрить отзыв')
     } finally {
       setIsSubmitting(false)
     }
@@ -318,7 +371,13 @@ export default function ReviewsList() {
             {reviews.map(review => (
               <div
                 key={review.id}
-                className={`border rounded-lg p-4 ${review.isPublished ? 'border-gray-200' : 'border-gray-200 bg-gray-50'}`}
+                className={`border rounded-lg p-4 ${
+                  review.isPublished
+                    ? 'border-gray-200'
+                    : review.isApproved
+                      ? 'border-gray-200 bg-yellow-50'
+                      : 'border-gray-200 bg-gray-50'
+                }`}
               >
                 <div className="flex justify-between items-start">
                   <div className="flex items-center">
@@ -336,15 +395,36 @@ export default function ReviewsList() {
                       <h3 className="font-bold">{review.customerName}</h3>
                       <div className="flex items-center space-x-2">
                         <RatingStars rating={review.rating} />
-                        {!review.isPublished && (
-                          <span className="text-xs text-gray-500 bg-gray-200 px-2 py-1 rounded-full">
-                            Скрыт
+                        {!review.isPublished && !review.isApproved && (
+                          <span className="text-xs text-orange-500 bg-orange-100 px-2 py-1 rounded-full">
+                            Ожидает проверки
+                          </span>
+                        )}
+                        {!review.isPublished && review.isApproved && (
+                          <span className="text-xs text-yellow-500 bg-yellow-100 px-2 py-1 rounded-full">
+                            Одобрен, скрыт
+                          </span>
+                        )}
+                        {review.isPublished && (
+                          <span className="text-xs text-green-500 bg-green-100 px-2 py-1 rounded-full">
+                            Опубликован
                           </span>
                         )}
                       </div>
                     </div>
                   </div>
                   <div className="flex space-x-2">
+                    {!review.isApproved && (
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        className="bg-green-50 hover:bg-green-100 text-green-700 hover:text-green-800"
+                        onClick={() => approveReview(review)}
+                      >
+                        <ThumbsUp className="w-4 h-4 mr-1" />
+                        Одобрить
+                      </Button>
+                    )}
                     <Button variant="outline" size="sm" onClick={() => openEditDialog(review)}>
                       <Pencil className="w-4 h-4" />
                     </Button>
@@ -356,23 +436,62 @@ export default function ReviewsList() {
                 <div className="mt-3 text-gray-600 text-sm">
                   {review.comment}
                 </div>
-                {review.imageUrl && (
-                  <div className="mt-2">
-                    <a
-                      href={review.imageUrl}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="text-xs text-blue-500 flex items-center"
-                    >
-                      <img
-                        src={review.imageUrl}
-                        alt={`Аватар ${review.customerName}`}
-                        className="w-8 h-8 object-cover rounded mr-2"
-                      />
-                      <ExternalLink className="w-3 h-3 ml-1" />
-                    </a>
-                  </div>
-                )}
+
+                {/* Отображение медиа-ресурсов отзыва */}
+                <div className="mt-3 flex flex-wrap gap-2">
+                  {review.imageUrl && (
+                    <div className="mt-2">
+                      <a
+                        href={review.imageUrl}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="text-xs text-blue-500 flex items-center"
+                      >
+                        <img
+                          src={review.imageUrl}
+                          alt={`Аватар ${review.customerName}`}
+                          className="w-8 h-8 object-cover rounded mr-2"
+                        />
+                        <span>Аватар</span>
+                        <ExternalLink className="w-3 h-3 ml-1" />
+                      </a>
+                    </div>
+                  )}
+
+                  {review.reviewImageUrl && (
+                    <div className="mt-2 ml-2">
+                      <a
+                        href={review.reviewImageUrl}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="text-xs text-blue-500 flex items-center"
+                      >
+                        <img
+                          src={review.reviewImageUrl}
+                          alt={`Фото к отзыву`}
+                          className="w-12 h-8 object-cover rounded mr-2"
+                        />
+                        <span>Фото отзыва</span>
+                        <ExternalLink className="w-3 h-3 ml-1" />
+                      </a>
+                    </div>
+                  )}
+
+                  {review.videoUrl && (
+                    <div className="mt-2 ml-2">
+                      <a
+                        href={review.videoUrl}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="text-xs text-blue-500 flex items-center"
+                      >
+                        <span>Видео отзыва</span>
+                        <ExternalLink className="w-3 h-3 ml-1" />
+                      </a>
+                    </div>
+                  )}
+                </div>
+
                 <div className="mt-2 text-xs text-gray-400">
                   Последнее обновление: {new Date(review.updatedAt).toLocaleDateString()}
                 </div>
@@ -436,6 +555,36 @@ export default function ReviewsList() {
               />
               <p className="text-xs text-gray-500">
                 Укажите URL изображения аватара клиента (необязательно)
+              </p>
+            </div>
+            <div className="space-y-2">
+              <label htmlFor="reviewImageUrl" className="text-sm font-medium">
+                URL изображения отзыва
+              </label>
+              <Input
+                id="reviewImageUrl"
+                name="reviewImageUrl"
+                value={formData.reviewImageUrl}
+                onChange={handleInputChange}
+                placeholder="https://example.com/review.jpg"
+              />
+              <p className="text-xs text-gray-500">
+                Укажите URL изображения отзыва (необязательно)
+              </p>
+            </div>
+            <div className="space-y-2">
+              <label htmlFor="videoUrl" className="text-sm font-medium">
+                URL видео отзыва
+              </label>
+              <Input
+                id="videoUrl"
+                name="videoUrl"
+                value={formData.videoUrl}
+                onChange={handleInputChange}
+                placeholder="https://example.com/video.mp4"
+              />
+              <p className="text-xs text-gray-500">
+                Укажите URL видео отзыва (необязательно)
               </p>
             </div>
             <div className="space-y-2">
@@ -555,6 +704,49 @@ export default function ReviewsList() {
               )}
             </div>
             <div className="space-y-2">
+              <label htmlFor="reviewImageUrl" className="text-sm font-medium">
+                URL изображения отзыва
+              </label>
+              <Input
+                id="reviewImageUrl"
+                name="reviewImageUrl"
+                value={formData.reviewImageUrl}
+                onChange={handleInputChange}
+                placeholder="https://example.com/review.jpg"
+              />
+              <p className="text-xs text-gray-500">
+                Укажите URL изображения отзыва или оставьте пустым, чтобы удалить
+              </p>
+              {formData.reviewImageUrl && (
+                <div className="mt-2 flex items-center">
+                  <img
+                    src={formData.reviewImageUrl}
+                    alt="Предпросмотр"
+                    className="w-10 h-10 object-cover rounded-full mr-2"
+                    onError={(e) => {
+                      (e.target as HTMLImageElement).style.display = 'none'
+                    }}
+                  />
+                  <span className="text-xs">Предпросмотр изображения отзыва</span>
+                </div>
+              )}
+            </div>
+            <div className="space-y-2">
+              <label htmlFor="videoUrl" className="text-sm font-medium">
+                URL видео отзыва
+              </label>
+              <Input
+                id="videoUrl"
+                name="videoUrl"
+                value={formData.videoUrl}
+                onChange={handleInputChange}
+                placeholder="https://example.com/video.mp4"
+              />
+              <p className="text-xs text-gray-500">
+                Укажите URL видео отзыва или оставьте пустым, чтобы удалить
+              </p>
+            </div>
+            <div className="space-y-2">
               <label className="text-sm font-medium">Статус публикации</label>
               <div className="flex space-x-4">
                 <button
@@ -582,6 +774,40 @@ export default function ReviewsList() {
                   Скрыт
                 </button>
               </div>
+            </div>
+
+            {/* Статус одобрения - добавим в диалоги редактирования */}
+            <div className="space-y-2">
+              <label className="text-sm font-medium">Статус одобрения</label>
+              <div className="flex space-x-4">
+                <button
+                  type="button"
+                  onClick={() => handleApprovedChange(true)}
+                  className={`px-3 py-1 rounded-full text-sm flex items-center ${
+                    formData.isApproved
+                      ? 'bg-green-100 text-green-800 border border-green-200'
+                      : 'bg-gray-100 text-gray-800 border border-gray-200'
+                  }`}
+                >
+                  <Check className="w-3 h-3 mr-1" />
+                  Одобрен
+                </button>
+                <button
+                  type="button"
+                  onClick={() => handleApprovedChange(false)}
+                  className={`px-3 py-1 rounded-full text-sm flex items-center ${
+                    !formData.isApproved
+                      ? 'bg-yellow-100 text-yellow-800 border border-yellow-200'
+                      : 'bg-gray-100 text-gray-800 border border-gray-200'
+                  }`}
+                >
+                  <X className="w-3 h-3 mr-1" />
+                  Не одобрен
+                </button>
+              </div>
+              <p className="text-xs text-gray-500">
+                Одобренный отзыв автоматически становится опубликованным
+              </p>
             </div>
           </div>
           <DialogFooter>

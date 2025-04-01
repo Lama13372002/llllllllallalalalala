@@ -48,7 +48,7 @@ export default function Header() {
         {/* Logo */}
         <Link
           href="/"
-          className="text-2xl font-bold text-primary flex items-center space-x-2 group"
+          className="text-2xl font-bold text-primary flex items-center space-x-2 group mr-auto"
         >
           {/* Логотип и название компании */}
           <div className="flex items-center">
@@ -58,15 +58,16 @@ export default function Header() {
               width={150}
               height={40}
               className="h-10 w-auto object-contain mr-2"
+              priority
             />
-            <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-600 to-indigo-700">
+            <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-600 to-indigo-700 hidden sm:inline">
               {settings.companyName}
             </span>
           </div>
         </Link>
 
         {/* Desktop Navigation */}
-        <nav className="hidden md:flex items-center space-x-1">
+        <nav className="hidden md:flex items-center space-x-1 ml-4">
           {navLinks.slice(0, 7).map((link) => (
             <Link
               key={link.name}
@@ -79,7 +80,7 @@ export default function Header() {
         </nav>
 
         {/* Contact & Book Button */}
-        <div className="hidden md:flex items-center space-x-4">
+        <div className="hidden md:flex items-center space-x-4 ml-2">
           {/* Social Media Icons */}
           <div className="flex space-x-2 mr-4">
             <a

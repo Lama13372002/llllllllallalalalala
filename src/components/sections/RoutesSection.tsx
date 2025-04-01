@@ -86,10 +86,7 @@ export default function RoutesSection() {
     }
 
     fetchRoutes()
-
-    // Обновляем данные каждую минуту (если нужно, можно убрать)
-    const interval = setInterval(fetchRoutes, 60000)
-    return () => clearInterval(interval)
+    // Убираем интервал обновления, который вызывает постоянную перезагрузку
   }, [])
 
   // Функция для получения цены в зависимости от класса автомобиля

@@ -27,25 +27,38 @@ export default function BlogSection() {
   const fetchFeaturedPosts = async () => {
     try {
       setIsLoading(true)
+      console.log('Fetching blog posts for home section...')
+
       // Добавляем параметр времени для предотвращения кеширования
       const cacheBuster = new Date().getTime()
-      const response = await fetch(`/api/blog/featured?t=${cacheBuster}`, {
+      const response = await fetch(`/api/blog/featured?nocache=${cacheBuster}`, {
+        method: 'GET',
         cache: 'no-store',
         headers: {
           'Pragma': 'no-cache',
-          'Cache-Control': 'no-cache'
+          'Cache-Control': 'no-store, no-cache, must-revalidate, proxy-revalidate',
+          'Expires': '0',
+          'Surrogate-Control': 'no-store'
         }
       })
-      const data = await response.json()
 
       if (!response.ok) {
-        throw new Error(data.error || 'Не удалось загрузить статьи блога')
+        throw new Error(`HTTP error! Status: ${response.status}`)
       }
 
-      setBlogPosts(data.blogPosts)
+      const data = await response.json()
+      console.log(`Received ${data.blogPosts?.length || 0} blog posts for home section`)
+
+      if (data.blogPosts && Array.isArray(data.blogPosts)) {
+        setBlogPosts(data.blogPosts)
+      } else {
+        console.error('Unexpected response format:', data)
+        setBlogPosts([])
+      }
     } catch (error) {
       console.error('Error fetching featured blog posts:', error)
       setError(error instanceof Error ? error.message : 'Произошла ошибка при загрузке статей')
+      setBlogPosts([]) // Устанавливаем пустой массив при ошибке
     } finally {
       setIsLoading(false)
     }
@@ -53,8 +66,6 @@ export default function BlogSection() {
 
   useEffect(() => {
     fetchFeaturedPosts()
-    // Убираем интервал для периодического обновления данных
-    // Теперь данные будут обновляться только при обновлении страницы
   }, [])
 
   // Функция для определения примерного времени чтения
@@ -64,6 +75,7 @@ export default function BlogSection() {
 
   // Если нет постов, не показываем секцию
   if (!isLoading && (blogPosts.length === 0 || error)) {
+    console.log('No blog posts found or error occurred, not showing blog section')
     return null
   }
 

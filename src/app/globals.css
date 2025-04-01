@@ -714,3 +714,53 @@
 .delay-800 { animation-delay: 800ms; }
 .delay-900 { animation-delay: 900ms; }
 .delay-1000 { animation-delay: 1000ms; }
+
+/* iOS specific fixes for calendar */
+@supports (-webkit-touch-callout: none) {
+  .rdp {
+    -webkit-touch-callout: none;
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  .rdp-day {
+    padding: 0;
+    margin: 0;
+    min-height: 36px;
+    min-width: 36px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  /* Fix for popover on iOS */
+  [role="dialog"] {
+    -webkit-overflow-scrolling: touch;
+  }
+
+  /* Fix for date input on iOS */
+  input[type="time"],
+  input[type="date"] {
+    -webkit-appearance: none;
+    min-height: 36px;
+    padding: 0 10px;
+  }
+}
+
+/* Fix для блока с отзывами - предотвращение прокрутки */
+#reviews-pagination {
+  scroll-margin-top: 0;
+  scroll-behavior: auto;
+  touch-action: manipulation;
+}
+
+#reviews-pagination button {
+  -webkit-tap-highlight-color: transparent;
+  touch-action: manipulation;
+}
+
+/* Предотвращение прокрутки при нажатии на кнопки */
+section#reviews button:active,
+section#reviews button:focus {
+  outline: none;
+  scroll-behavior: auto;
+}

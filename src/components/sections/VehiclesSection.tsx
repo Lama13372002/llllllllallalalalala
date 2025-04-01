@@ -276,16 +276,16 @@ export default function VehiclesSection() {
           <div className="relative">
             <Tabs defaultValue={vehicles[0]?.id} onValueChange={setActiveVehicle} className="w-full">
               <div
-                className="sticky top-0 z-30 bg-white/95 dark:bg-gray-800/95 backdrop-blur-sm shadow-sm py-4 -mx-4 px-4 sm:mx-0 sm:px-0 sm:py-3"
+                className="sticky top-0 z-30 bg-white/95 dark:bg-gray-800/95 backdrop-blur-sm shadow-sm py-4 -mx-4 px-4 sm:mx-0 sm:px-0 sm:py-3 overflow-x-auto"
               >
-                <TabsList className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 w-full max-w-sm mx-auto lg:max-w-none lg:w-auto gap-2 p-2 lg:p-1">
+                <TabsList className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 w-full max-w-full mx-auto gap-2 p-2 lg:p-1 min-w-max">
                   {vehicles.map((vehicle) => (
                     <TabsTrigger
                       key={vehicle.id}
                       value={vehicle.id}
-                      className="flex items-center justify-center gap-1.5 text-sm py-3 px-2 rounded-md transition-all duration-300 shadow-sm hover:shadow-md hover:-translate-y-0.5 data-[state=active]:bg-primary data-[state=active]:text-primary-foreground data-[state=active]:shadow-lg data-[state=active]:scale-105 data-[state=active]:font-medium vehicles-tab-active"
+                      className="flex items-center justify-center gap-1.5 text-xs sm:text-sm py-2 sm:py-3 px-1 sm:px-2 rounded-md transition-all duration-300 shadow-sm hover:shadow-md hover:-translate-y-0.5 data-[state=active]:bg-primary data-[state=active]:text-primary-foreground data-[state=active]:shadow-lg data-[state=active]:scale-105 data-[state=active]:font-medium vehicles-tab-active"
                     >
-                      <Car className="w-4 h-4 flex-shrink-0" />
+                      <Car className="w-3 h-3 sm:w-4 sm:h-4 flex-shrink-0" />
                       <span className="whitespace-nowrap font-medium">{vehicle.name}</span>
                       {vehicle.name === 'VIP' && (
                         <span className="absolute -top-2 -right-2 bg-red-500 text-white text-[10px] px-1.5 py-0.5 rounded-full animate-pulse">
@@ -297,7 +297,7 @@ export default function VehiclesSection() {
                 </TabsList>
               </div>
 
-              <div className="mt-32 sm:mt-12 md:mt-10">
+              <div className="mt-24 sm:mt-12 md:mt-10">
                 {vehicles.map((vehicle) => (
                   <TabsContent
                     key={vehicle.id}
@@ -305,16 +305,12 @@ export default function VehiclesSection() {
                     className="focus-visible:outline-none focus-visible:ring-0 mt-0 pt-0"
                   >
                     <motion.div
-                      className="grid md:grid-cols-2 gap-10 items-center"
+                      className="grid md:grid-cols-2 gap-8 md:gap-10 items-center"
                       initial={{ opacity: 0, y: 20 }}
                       animate={{ opacity: 1, y: 0 }}
                       transition={{ duration: 0.5 }}
                     >
                       <div className="relative rounded-lg overflow-hidden shadow-xl group">
-                        {/* Добавляем вывод URL изображения для отладки */}
-                        {/* <div className="absolute top-0 left-0 p-2 bg-black/50 text-white text-xs">
-                          URL: {vehicle.imageUrl || 'Нет изображения'}
-                        </div> */}
                         <div
                           className="aspect-[16/9] bg-cover bg-center relative transition-all duration-700 transform group-hover:scale-105"
                           style={{
@@ -330,15 +326,15 @@ export default function VehiclesSection() {
 
                       <div>
                         <div className="mb-6">
-                          <h3 className="text-2xl md:text-3xl font-bold mb-2 text-gray-900 dark:text-white flex items-center">
-                            <Car className="w-5 h-5 mr-2 text-primary" />
+                          <h3 className="text-xl sm:text-2xl md:text-3xl font-bold mb-2 text-gray-900 dark:text-white flex flex-wrap items-center gap-1">
+                            <Car className="w-5 h-5 mr-1 text-primary" />
                             <span className="bg-clip-text text-transparent bg-gradient-to-r from-primary to-blue-700">
                               {vehicle.name}
                             </span>
                             <span className="mx-1">-</span>
                             <span>{vehicle.brand} {vehicle.model}</span>
                           </h3>
-                          <p className="text-gray-500 dark:text-gray-400 text-sm mb-4 flex items-center gap-2">
+                          <p className="text-gray-500 dark:text-gray-400 text-sm mb-4 flex items-center flex-wrap gap-2">
                             <span className="inline-flex items-center px-2 py-1 rounded-full bg-gray-100 dark:bg-gray-800 text-xs">
                               {vehicle.year} год
                             </span>
@@ -351,7 +347,7 @@ export default function VehiclesSection() {
                             {vehicle.description}
                           </p>
 
-                          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 mb-8">
+                          <div className="grid grid-cols-1 xs:grid-cols-2 gap-3 mb-8">
                             {vehicle.features.map((feature, index) => (
                               <div
                                 key={index}
@@ -360,22 +356,22 @@ export default function VehiclesSection() {
                                 <div className="text-primary group-hover:scale-110 transition-transform">
                                   {featureIcons[feature] ?? <Check className="w-4 h-4" />}
                                 </div>
-                                <span>{feature}</span>
+                                <span className="text-sm sm:text-base">{feature}</span>
                               </div>
                             ))}
                           </div>
 
                           <Dialog>
                             <DialogTrigger asChild>
-                              <Button className="w-full sm:w-auto btn-gradient relative group overflow-hidden rounded-full font-medium transition-all px-8 py-6 vehicle-order-button">
+                              <Button className="w-full sm:w-auto btn-gradient relative group overflow-hidden rounded-full font-medium transition-all px-4 sm:px-8 py-4 sm:py-6 vehicle-order-button">
                                 <span className="relative z-10 flex items-center justify-center gap-2">
                                   <span>Выбрать класс</span>
-                                  <ChevronRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
+                                  <ChevronRight className="w-4 h-4 sm:w-5 sm:h-5 group-hover:translate-x-1 transition-transform" />
                                 </span>
                                 <span className="absolute inset-0 bg-white/20 transform translate-y-full group-hover:translate-y-0 transition-transform duration-300"></span>
                               </Button>
                             </DialogTrigger>
-                            <DialogContent className="sm:max-w-[625px] p-0 overflow-hidden">
+                            <DialogContent className="sm:max-w-[625px] p-0 overflow-hidden max-w-[95vw] mx-auto">
                               <BookingForm />
                             </DialogContent>
                           </Dialog>

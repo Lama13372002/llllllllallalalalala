@@ -8,7 +8,7 @@ import './globals.css'
 const inter = Inter({ subsets: ['latin', 'cyrillic'] })
 
 export const metadata: Metadata = {
-  title: 'RoyalTransfer',
+  title: 'RoyalTransfer - Комфортные трансферы из Калининграда в Европу',
   description: 'Трансферы из Калининграда в города Европы',
 }
 

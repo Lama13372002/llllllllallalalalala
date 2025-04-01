@@ -481,9 +481,6 @@ export default function BookingForm() {
                           }}
                           placeholder="Выберите дату"
                         />
-                        <div className="absolute right-3 top-1/2 transform -translate-y-1/2 pointer-events-none">
-                          <CalendarIcon className="h-4 w-4 opacity-50" />
-                        </div>
                       </div>
                     </FormControl>
                     <FormMessage />
@@ -758,9 +755,6 @@ export default function BookingForm() {
                             }}
                             placeholder="Выберите дату"
                           />
-                          <div className="absolute right-3 top-1/2 transform -translate-y-1/2 pointer-events-none">
-                            <CalendarIcon className="h-4 w-4 opacity-50" />
-                          </div>
                         </div>
                       </FormControl>
                       <FormMessage />

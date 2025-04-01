@@ -340,7 +340,7 @@ export default function BookingForm() {
   }
 
   return (
-    <div className="relative max-h-[90vh] overflow-y-auto">
+    <div className="relative max-h-[90vh] overflow-y-auto pb-20">
       <div className="sticky top-0 bg-white dark:bg-gray-950 z-10 p-4 flex items-center justify-between border-b">
         <h2 className="text-xl font-bold">{transferConfig?.title || 'Заказать трансфер'}</h2>
         <Button
@@ -824,13 +824,15 @@ export default function BookingForm() {
               )}
             />
 
-            <Button
-              type="submit"
-              className="w-full btn-gradient"
-              disabled={isSubmitting}
-            >
-              {isSubmitting ? 'Отправка...' : 'Заказать трансфер'}
-            </Button>
+            <div className="submit-button-container sticky bottom-0 bg-white dark:bg-gray-950 py-4 mt-6 z-10">
+              <Button
+                type="submit"
+                className="w-full btn-gradient"
+                disabled={isSubmitting}
+              >
+                {isSubmitting ? 'Отправка...' : 'Заказать трансфер'}
+              </Button>
+            </div>
           </form>
         </Form>
       </div>

@@ -134,13 +134,15 @@ export default function ReviewsSection() {
   // Total pages calculation
   const totalPages = Math.max(1, Math.ceil(reviews.length / reviewsPerPage))
 
-  const nextPage = () => {
-    setActiveIndex((prev) => (prev + 1) % totalPages)
-  }
+  const nextPage = (e: React.MouseEvent) => {
+    e.preventDefault(); // Предотвращаем стандартное поведение браузера
+    setActiveIndex((prev) => (prev + 1) % totalPages);
+  };
 
-  const prevPage = () => {
-    setActiveIndex((prev) => (prev - 1 + totalPages) % totalPages)
-  }
+  const prevPage = (e: React.MouseEvent) => {
+    e.preventDefault(); // Предотвращаем стандартное поведение браузера
+    setActiveIndex((prev) => (prev - 1 + totalPages) % totalPages);
+  };
 
   return (
     <section id="reviews" className="py-20 bg-white dark:bg-gray-800">
@@ -182,13 +184,14 @@ export default function ReviewsSection() {
             </div>
 
             {totalPages > 1 && (
-              <div className="flex justify-center items-center space-x-2 mt-8">
+              <div className="flex justify-center items-center space-x-2 mt-8" id="reviews-pagination">
                 <Button
                   variant="outline"
                   size="icon"
                   onClick={prevPage}
                   className="rounded-full"
                   aria-label="Предыдущая страница"
+                  type="button"
                 >
                   <ChevronLeft className="h-4 w-4" />
                 </Button>
@@ -197,12 +200,16 @@ export default function ReviewsSection() {
                   {Array.from({ length: totalPages }).map((_, index) => (
                     <button
                       key={index}
+                      type="button"
                       className={`w-2 h-2 rounded-full transition-all ${
                         activeIndex === index
                           ? 'bg-primary w-4'
                           : 'bg-gray-300 dark:bg-gray-600'
                       }`}
-                      onClick={() => setActiveIndex(index)}
+                      onClick={(e) => {
+                        e.preventDefault();
+                        setActiveIndex(index);
+                      }}
                       aria-label={`Страница ${index + 1}`}
                     />
                   ))}
@@ -214,6 +221,7 @@ export default function ReviewsSection() {
                   onClick={nextPage}
                   className="rounded-full"
                   aria-label="Следующая страница"
+                  type="button"
                 >
                   <ChevronRight className="h-4 w-4" />
                 </Button>

@@ -467,39 +467,25 @@ export default function BookingForm() {
                 render={({ field }) => (
                   <FormItem className="flex flex-col">
                     <FormLabel>Дата</FormLabel>
-                    <Popover>
-                      <PopoverTrigger asChild>
-                        <FormControl>
-                          <Button
-                            variant={"outline"}
-                            className={cn(
-                              "w-full pl-3 text-left font-normal form-input-focus",
-                              !field.value && "text-muted-foreground"
-                            )}
-                          >
-                            {field.value ? (
-                              format(field.value, "PPP", { locale: ru })
-                            ) : (
-                              <span>Выберите дату</span>
-                            )}
-                            <CalendarIcon className="ml-auto h-4 w-4 opacity-50" />
-                          </Button>
-                        </FormControl>
-                      </PopoverTrigger>
-                      <PopoverContent className="w-auto p-0 z-50 overflow-visible" align="start">
-                        <Calendar
-                          mode="single"
-                          selected={field.value}
-                          onSelect={field.onChange}
-                          disabled={(date) =>
-                            date < new Date(new Date().setHours(0, 0, 0, 0))
-                          }
-                          initialFocus
-                          fixedWeeks
-                          ISOWeek
+                    {/* Для iOS используем нативный input type="date" */}
+                    <FormControl>
+                      <div className="relative w-full">
+                        <Input
+                          type="date"
+                          className="form-input-focus w-full"
+                          min={new Date().toISOString().split('T')[0]}
+                          value={field.value ? format(field.value, 'yyyy-MM-dd') : ''}
+                          onChange={(e) => {
+                            const date = e.target.value ? new Date(e.target.value) : null;
+                            field.onChange(date);
+                          }}
+                          placeholder="Выберите дату"
                         />
-                      </PopoverContent>
-                    </Popover>
+                        <div className="absolute right-3 top-1/2 transform -translate-y-1/2 pointer-events-none">
+                          <CalendarIcon className="h-4 w-4 opacity-50" />
+                        </div>
+                      </div>
+                    </FormControl>
                     <FormMessage />
                   </FormItem>
                 )}
@@ -512,7 +498,14 @@ export default function BookingForm() {
                   <FormItem>
                     <FormLabel>Время</FormLabel>
                     <FormControl>
-                      <Input type="time" placeholder="Выберите время" {...field} className="form-input-focus" />
+                      <div className="relative w-full">
+                        <Input
+                          type="time"
+                          placeholder="Выберите время"
+                          {...field}
+                          className="form-input-focus w-full"
+                        />
+                      </div>
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -751,39 +744,25 @@ export default function BookingForm() {
                   render={({ field }) => (
                     <FormItem className="flex flex-col">
                       <FormLabel>Дата обратного трансфера</FormLabel>
-                      <Popover>
-                        <PopoverTrigger asChild>
-                          <FormControl>
-                            <Button
-                              variant={"outline"}
-                              className={cn(
-                                "w-full pl-3 text-left font-normal form-input-focus",
-                                !field.value && "text-muted-foreground"
-                              )}
-                            >
-                              {field.value ? (
-                                format(field.value, "PPP", { locale: ru })
-                              ) : (
-                                <span>Выберите дату</span>
-                              )}
-                              <CalendarIcon className="ml-auto h-4 w-4 opacity-50" />
-                            </Button>
-                          </FormControl>
-                        </PopoverTrigger>
-                        <PopoverContent className="w-auto p-0 z-50 overflow-visible" align="start">
-                          <Calendar
-                            mode="single"
-                            selected={field.value}
-                            onSelect={field.onChange}
-                            disabled={(date) =>
-                              date < new Date(new Date().setHours(0, 0, 0, 0))
-                            }
-                            initialFocus
-                            fixedWeeks
-                            ISOWeek
+                      {/* Для iOS используем нативный input type="date" */}
+                      <FormControl>
+                        <div className="relative w-full">
+                          <Input
+                            type="date"
+                            className="form-input-focus w-full"
+                            min={new Date().toISOString().split('T')[0]}
+                            value={field.value ? format(field.value, 'yyyy-MM-dd') : ''}
+                            onChange={(e) => {
+                              const date = e.target.value ? new Date(e.target.value) : null;
+                              field.onChange(date);
+                            }}
+                            placeholder="Выберите дату"
                           />
-                        </PopoverContent>
-                      </Popover>
+                          <div className="absolute right-3 top-1/2 transform -translate-y-1/2 pointer-events-none">
+                            <CalendarIcon className="h-4 w-4 opacity-50" />
+                          </div>
+                        </div>
+                      </FormControl>
                       <FormMessage />
                     </FormItem>
                   )}
@@ -796,7 +775,14 @@ export default function BookingForm() {
                     <FormItem>
                       <FormLabel>Время обратного трансфера</FormLabel>
                       <FormControl>
-                        <Input type="time" placeholder="Выберите время" {...field} className="form-input-focus" />
+                        <div className="relative w-full">
+                          <Input
+                            type="time"
+                            placeholder="Выберите время"
+                            {...field}
+                            className="form-input-focus w-full"
+                          />
+                        </div>
                       </FormControl>
                       <FormMessage />
                     </FormItem>

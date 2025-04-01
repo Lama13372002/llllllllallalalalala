@@ -24,26 +24,37 @@ export default function BlogSection() {
   const [isLoading, setIsLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
 
-  useEffect(() => {
-    const fetchFeaturedPosts = async () => {
-      try {
-        const response = await fetch('/api/blog/featured')
-        const data = await response.json()
-
-        if (!response.ok) {
-          throw new Error(data.error || 'Не удалось загрузить статьи блога')
+  const fetchFeaturedPosts = async () => {
+    try {
+      setIsLoading(true)
+      // Добавляем параметр времени для предотвращения кеширования
+      const cacheBuster = new Date().getTime()
+      const response = await fetch(`/api/blog/featured?t=${cacheBuster}`, {
+        cache: 'no-store',
+        headers: {
+          'Pragma': 'no-cache',
+          'Cache-Control': 'no-cache'
         }
+      })
+      const data = await response.json()
 
-        setBlogPosts(data.blogPosts)
-      } catch (error) {
-        console.error('Error fetching featured blog posts:', error)
-        setError(error instanceof Error ? error.message : 'Произошла ошибка при загрузке статей')
-      } finally {
-        setIsLoading(false)
+      if (!response.ok) {
+        throw new Error(data.error || 'Не удалось загрузить статьи блога')
       }
-    }
 
+      setBlogPosts(data.blogPosts)
+    } catch (error) {
+      console.error('Error fetching featured blog posts:', error)
+      setError(error instanceof Error ? error.message : 'Произошла ошибка при загрузке статей')
+    } finally {
+      setIsLoading(false)
+    }
+  }
+
+  useEffect(() => {
     fetchFeaturedPosts()
+    // Убираем интервал для периодического обновления данных
+    // Теперь данные будут обновляться только при обновлении страницы
   }, [])
 
   // Функция для определения примерного времени чтения

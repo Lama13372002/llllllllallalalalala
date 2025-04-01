@@ -746,7 +746,7 @@
   }
 }
 
-/* Улучшенные стили для нативных полей даты, особенно для iOS */
+/* Улучшенные стили для нативных полей даты на всех устройствах */
 input[type="date"] {
   appearance: none;
   -webkit-appearance: none;
@@ -760,13 +760,7 @@ input[type="date"] {
   width: 100%;
 }
 
-/* Стилизация placeholder для поля даты на iOS */
-input[type="date"]::placeholder {
-  color: #6b7280;
-  opacity: 1;
-}
-
-/* Стили для полей ввода времени, особенно для iOS */
+/* Стили для полей ввода времени на всех устройствах */
 input[type="time"] {
   appearance: none;
   -webkit-appearance: none;
@@ -780,7 +774,7 @@ input[type="time"] {
   width: 100%;
 }
 
-/* Особые стили для iOS Safari */
+/* Стили для iOS */
 @supports (-webkit-touch-callout: none) {
   /* Общие стили для полей ввода */
   input[type="date"],
@@ -799,13 +793,23 @@ input[type="time"] {
   input[type="date"]::-webkit-calendar-picker-indicator,
   input[type="time"]::-webkit-calendar-picker-indicator,
   input[type="time"]::-webkit-time-picker-indicator {
-    opacity: 0;
+    background-position: right center;
+    background-size: 20px;
     position: absolute;
-    right: 0;
-    top: 0;
-    width: 100%;
-    height: 100%;
-    cursor: pointer;
+    right: 8px;
+    top: 50%;
+    transform: translateY(-50%);
+    margin: 0;
+  }
+}
+
+/* Стили для Android и других устройств */
+@supports not (-webkit-touch-callout: none) {
+  input[type="date"]::-webkit-calendar-picker-indicator,
+  input[type="time"]::-webkit-calendar-picker-indicator {
+    background-position: right center;
+    background-size: 20px;
+    margin-right: 0;
   }
 }
 

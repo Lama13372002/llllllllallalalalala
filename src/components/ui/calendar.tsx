@@ -18,7 +18,7 @@ function Calendar({
   return (
     <DayPicker
       showOutsideDays={showOutsideDays}
-      className={cn("p-3", className)}
+      className={cn("p-3 select-none touch-manipulation", className)}
       classNames={{
         months: "flex flex-col sm:flex-row space-y-4 sm:space-x-4 sm:space-y-0",
         month: "space-y-4",
@@ -58,5 +58,12 @@ function Calendar({
   )
 }
 Calendar.displayName = "Calendar"
+
+// Mobile settings for iOS
+const mobileStyles = {
+  // Add any specific mobile styles or settings here
+  touchAction: "manipulation",
+  WebkitOverflowScrolling: "touch",
+};
 
 export { Calendar }

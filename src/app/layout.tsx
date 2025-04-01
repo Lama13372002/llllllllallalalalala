@@ -1,18 +1,15 @@
-import './globals.css'
 import type { Metadata } from 'next'
 import { Inter } from 'next/font/google'
-import Header from '@/components/layout/Header'
-import Footer from '@/components/layout/Footer'
 import { SettingsProvider } from '@/lib/settings-context'
 import { HomeSettingsProvider } from '@/lib/home-settings-context'
 import { Toaster } from 'sonner'
-import ClientBody from './ClientBody'
+import './globals.css'
 
 const inter = Inter({ subsets: ['latin', 'cyrillic'] })
 
 export const metadata: Metadata = {
-  title: 'Royal Transfer - Комфортные трансферы из Калининграда в Европу',
-  description: 'Безопасные и удобные поездки в города Европы с комфортом и по фиксированным ценам',
+  title: 'RoyalTransfer',
+  description: 'Трансферы из Калининграда в города Европы',
 }
 
 export default function RootLayout({
@@ -21,21 +18,15 @@ export default function RootLayout({
   children: React.ReactNode
 }) {
   return (
-    <html lang="ru" className="scroll-smooth">
-      <ClientBody>
+    <html lang="ru">
+      <body className={inter.className}>
         <SettingsProvider>
           <HomeSettingsProvider>
-            <div className={`flex flex-col min-h-screen ${inter.className}`}>
-              <Header />
-              <main className="flex-grow">
-                {children}
-              </main>
-              <Footer />
-              <Toaster position="top-right" />
-            </div>
+            {children}
+            <Toaster position="top-right" richColors />
           </HomeSettingsProvider>
         </SettingsProvider>
-      </ClientBody>
+      </body>
     </html>
   )
 }

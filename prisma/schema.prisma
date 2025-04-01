@@ -116,8 +116,11 @@ model Review {
   customerName String
   rating       Int
   comment      String    @db.Text
-  imageUrl     String?
-  isPublished  Boolean   @default(true)
+  imageUrl     String?   // URL аватарки пользователя
+  reviewImageUrl String? // URL изображения отзыва
+  videoUrl     String?   // URL видео отзыва
+  isPublished  Boolean   @default(false) // Изменим на false по умолчанию, чтобы сначала одобрить отзыв
+  isApproved   Boolean   @default(false) // Новое поле для одобрения отзыва админом
   createdAt    DateTime  @default(now())
   updatedAt    DateTime  @updatedAt
 }

@@ -60,7 +60,7 @@ export default function Header() {
               className="h-10 w-auto object-contain mr-2"
               priority
             />
-            <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-600 to-indigo-700 hidden sm:inline">
+            <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-600 to-indigo-700 hidden sm:inline text-sm font-medium">
               {settings.companyName}
             </span>
           </div>

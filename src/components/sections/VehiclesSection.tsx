@@ -1,11 +1,11 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import { motion } from 'framer-motion'
 import { Dialog, DialogContent, DialogTrigger } from '@/components/ui/dialog'
 import { Button } from '@/components/ui/button'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
-import { Car, Users, Briefcase, Wifi, Leaf, Coffee, Check, ChevronRight } from 'lucide-react'
+import { Car, Users, Briefcase, Wifi, Leaf, Coffee, Check, ChevronRight, ChevronLeft } from 'lucide-react'
 import BookingForm from '@/components/forms/BookingForm'
 
 // Тип для транспортных средств из API
@@ -126,6 +126,43 @@ export default function VehiclesSection() {
   const [activeVehicle, setActiveVehicle] = useState<string>('')
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
+  const [showLeftScroll, setShowLeftScroll] = useState(false)
+  const [showRightScroll, setShowRightScroll] = useState(true)
+
+  const tabsListRef = useRef<HTMLDivElement>(null)
+
+  // Функция для определения видимости стрелок прокрутки
+  const checkScrollIndicators = () => {
+    if (tabsListRef.current) {
+      const { scrollLeft, scrollWidth, clientWidth } = tabsListRef.current
+      setShowLeftScroll(scrollLeft > 0)
+      setShowRightScroll(scrollLeft < scrollWidth - clientWidth - 5)
+
+      // Найдем родительский контейнер и добавим/удалим класс для левого градиента
+      const tabsContainer = tabsListRef.current.closest('.vehicles-tabs-container')
+      if (tabsContainer) {
+        if (scrollLeft > 0) {
+          tabsContainer.classList.add('can-scroll-left')
+        } else {
+          tabsContainer.classList.remove('can-scroll-left')
+        }
+      }
+    }
+  }
+
+  // Функция для прокрутки списка влево
+  const scrollLeft = () => {
+    if (tabsListRef.current) {
+      tabsListRef.current.scrollBy({ left: -100, behavior: 'smooth' })
+    }
+  }
+
+  // Функция для прокрутки списка вправо
+  const scrollRight = () => {
+    if (tabsListRef.current) {
+      tabsListRef.current.scrollBy({ left: 100, behavior: 'smooth' })
+    }
+  }
 
   // Функция для конвертации данных из БД в формат для отображения
   const formatVehicleData = (dbVehicle: DBVehicle): DisplayVehicle => {
@@ -211,6 +248,21 @@ export default function VehiclesSection() {
     }
   }, [vehicles])
 
+  // Добавляем эффект для отслеживания прокрутки
+  useEffect(() => {
+    const tabsListElement = tabsListRef.current
+    if (tabsListElement) {
+      checkScrollIndicators()
+      tabsListElement.addEventListener('scroll', checkScrollIndicators)
+      window.addEventListener('resize', checkScrollIndicators)
+
+      return () => {
+        tabsListElement.removeEventListener('scroll', checkScrollIndicators)
+        window.removeEventListener('resize', checkScrollIndicators)
+      }
+    }
+  }, [vehicles])
+
   // Если данные загружаются, показываем индикатор загрузки
   if (loading) {
     return (
@@ -276,25 +328,53 @@ export default function VehiclesSection() {
           <div className="relative">
             <Tabs defaultValue={vehicles[0]?.id} onValueChange={setActiveVehicle} className="w-full">
               <div
-                className="sticky top-0 z-30 bg-white/95 dark:bg-gray-800/95 backdrop-blur-sm shadow-sm py-4 -mx-4 px-4 sm:mx-0 sm:px-0 sm:py-3 overflow-x-auto"
+                className="sticky top-0 z-30 bg-white/95 dark:bg-gray-800/95 backdrop-blur-sm shadow-sm py-4 -mx-4 px-4 sm:mx-0 sm:px-0 sm:py-3 overflow-x-auto vehicles-tabs-container"
               >
-                <TabsList className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 w-full max-w-full mx-auto gap-2 p-2 lg:p-1 min-w-max">
-                  {vehicles.map((vehicle) => (
-                    <TabsTrigger
-                      key={vehicle.id}
-                      value={vehicle.id}
-                      className="flex items-center justify-center gap-1.5 text-xs sm:text-sm py-2 sm:py-3 px-1 sm:px-2 rounded-md transition-all duration-300 shadow-sm hover:shadow-md hover:-translate-y-0.5 data-[state=active]:bg-primary data-[state=active]:text-primary-foreground data-[state=active]:shadow-lg data-[state=active]:scale-105 data-[state=active]:font-medium vehicles-tab-active"
+                {/* Добавляем стрелки прокрутки */}
+                <div className="relative">
+                  {showLeftScroll && (
+                    <button
+                      className="absolute left-0 top-1/2 transform -translate-y-1/2 z-10 bg-white/80 dark:bg-gray-800/80 rounded-full p-1 shadow-md md:hidden"
+                      onClick={scrollLeft}
+                      aria-label="Прокрутить влево"
                     >
-                      <Car className="w-3 h-3 sm:w-4 sm:h-4 flex-shrink-0" />
-                      <span className="whitespace-nowrap font-medium">{vehicle.name}</span>
-                      {vehicle.name === 'VIP' && (
-                        <span className="absolute -top-2 -right-2 bg-red-500 text-white text-[10px] px-1.5 py-0.5 rounded-full animate-pulse">
-                          New
-                        </span>
-                      )}
-                    </TabsTrigger>
-                  ))}
-                </TabsList>
+                      <ChevronLeft className="w-4 h-4 text-primary" />
+                    </button>
+                  )}
+
+                  <div
+                    ref={tabsListRef}
+                    className="overflow-x-auto pb-1"
+                  >
+                    <TabsList className="flex w-full max-w-full mx-auto gap-1.5 p-1.5 min-w-max vehicles-tabs-list">
+                      {vehicles.map((vehicle) => (
+                        <TabsTrigger
+                          key={vehicle.id}
+                          value={vehicle.id}
+                          className="flex items-center justify-center gap-1 text-xs py-1.5 px-1.5 rounded-md transition-all duration-300 shadow-sm hover:shadow-md hover:-translate-y-0.5 data-[state=active]:bg-primary data-[state=active]:text-primary-foreground data-[state=active]:shadow-lg data-[state=active]:scale-105 data-[state=active]:font-medium vehicles-tab-active vehicle-tab-item"
+                        >
+                          <Car className="w-3 h-3 flex-shrink-0 vehicle-tab-icon" />
+                          <span className="whitespace-nowrap font-medium vehicle-tab-text">{vehicle.name}</span>
+                          {vehicle.name === 'VIP' && (
+                            <span className="absolute -top-2 -right-2 bg-red-500 text-white text-[10px] px-1.5 py-0.5 rounded-full animate-pulse">
+                              New
+                            </span>
+                          )}
+                        </TabsTrigger>
+                      ))}
+                    </TabsList>
+                  </div>
+
+                  {showRightScroll && (
+                    <button
+                      className="absolute right-0 top-1/2 transform -translate-y-1/2 z-10 bg-white/80 dark:bg-gray-800/80 rounded-full p-1 shadow-md md:hidden"
+                      onClick={scrollRight}
+                      aria-label="Прокрутить вправо"
+                    >
+                      <ChevronRight className="w-4 h-4 text-primary" />
+                    </button>
+                  )}
+                </div>
               </div>
 
               <div className="mt-24 sm:mt-12 md:mt-10">

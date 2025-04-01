@@ -9,8 +9,10 @@ import CTA from '@/components/sections/CTA'
 import Header from '@/components/layout/Header'
 import Footer from '@/components/layout/Footer'
 
-// Force static generation
-export const dynamic = 'force-static'
+// Изменяем на динамическую генерацию страницы
+export const dynamic = 'force-dynamic'
+export const fetchCache = 'force-no-store'
+export const revalidate = 0
 
 export default function Home() {
   return (

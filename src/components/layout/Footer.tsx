@@ -25,7 +25,7 @@ export default function Footer() {
                   height={40}
                   className="h-10 w-auto object-contain mr-2"
                 />
-                <h3 className="text-xl font-bold">
+                <h3 className="text-base font-medium">
                   <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-500 to-indigo-600">
                     {settings.companyName}
                   </span>

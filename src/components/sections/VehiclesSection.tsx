@@ -330,11 +330,11 @@ export default function VehiclesSection() {
               <div
                 className="sticky top-0 z-30 bg-white/95 dark:bg-gray-800/95 backdrop-blur-sm shadow-sm py-4 -mx-4 px-4 sm:mx-0 sm:px-0 sm:py-3 overflow-x-auto vehicles-tabs-container"
               >
-                {/* Добавляем стрелки прокрутки */}
+                {/* Добавляем стрелки прокрутки только для мобильных */}
                 <div className="relative">
                   {showLeftScroll && (
                     <button
-                      className="absolute left-0 top-1/2 transform -translate-y-1/2 z-10 bg-white/80 dark:bg-gray-800/80 rounded-full p-1 shadow-md md:hidden"
+                      className="absolute left-0 top-1/2 transform -translate-y-1/2 z-10 bg-white/80 dark:bg-gray-800/80 rounded-full p-1 shadow-md sm:hidden"
                       onClick={scrollLeft}
                       aria-label="Прокрутить влево"
                     >
@@ -346,14 +346,14 @@ export default function VehiclesSection() {
                     ref={tabsListRef}
                     className="overflow-x-auto pb-1"
                   >
-                    <TabsList className="flex w-full max-w-full mx-auto gap-1.5 p-1.5 min-w-max vehicles-tabs-list">
+                    <TabsList className="sm:grid sm:grid-cols-3 lg:grid-cols-6 sm:gap-2 sm:p-2 lg:p-1 flex w-full max-w-full mx-auto gap-1.5 p-1.5 min-w-max vehicles-tabs-list">
                       {vehicles.map((vehicle) => (
                         <TabsTrigger
                           key={vehicle.id}
                           value={vehicle.id}
-                          className="flex items-center justify-center gap-1 text-xs py-1.5 px-1.5 rounded-md transition-all duration-300 shadow-sm hover:shadow-md hover:-translate-y-0.5 data-[state=active]:bg-primary data-[state=active]:text-primary-foreground data-[state=active]:shadow-lg data-[state=active]:scale-105 data-[state=active]:font-medium vehicles-tab-active vehicle-tab-item"
+                          className="flex items-center justify-center gap-1 text-xs sm:text-sm py-1.5 px-1.5 sm:py-3 sm:px-2 rounded-md transition-all duration-300 shadow-sm hover:shadow-md hover:-translate-y-0.5 data-[state=active]:bg-primary data-[state=active]:text-primary-foreground data-[state=active]:shadow-lg data-[state=active]:scale-105 data-[state=active]:font-medium vehicles-tab-active vehicle-tab-item"
                         >
-                          <Car className="w-3 h-3 flex-shrink-0 vehicle-tab-icon" />
+                          <Car className="w-3 h-3 sm:w-4 sm:h-4 flex-shrink-0 vehicle-tab-icon" />
                           <span className="whitespace-nowrap font-medium vehicle-tab-text">{vehicle.name}</span>
                           {vehicle.name === 'VIP' && (
                             <span className="absolute -top-2 -right-2 bg-red-500 text-white text-[10px] px-1.5 py-0.5 rounded-full animate-pulse">
@@ -367,7 +367,7 @@ export default function VehiclesSection() {
 
                   {showRightScroll && (
                     <button
-                      className="absolute right-0 top-1/2 transform -translate-y-1/2 z-10 bg-white/80 dark:bg-gray-800/80 rounded-full p-1 shadow-md md:hidden"
+                      className="absolute right-0 top-1/2 transform -translate-y-1/2 z-10 bg-white/80 dark:bg-gray-800/80 rounded-full p-1 shadow-md sm:hidden"
                       onClick={scrollRight}
                       aria-label="Прокрутить вправо"
                     >

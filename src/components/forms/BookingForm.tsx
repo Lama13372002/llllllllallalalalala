@@ -486,7 +486,7 @@ export default function BookingForm() {
                           </Button>
                         </FormControl>
                       </PopoverTrigger>
-                      <PopoverContent className="w-auto p-0" align="start">
+                      <PopoverContent className="w-auto p-0 z-50 overflow-visible" align="start">
                         <Calendar
                           mode="single"
                           selected={field.value}
@@ -495,6 +495,8 @@ export default function BookingForm() {
                             date < new Date(new Date().setHours(0, 0, 0, 0))
                           }
                           initialFocus
+                          fixedWeeks
+                          ISOWeek
                         />
                       </PopoverContent>
                     </Popover>
@@ -768,7 +770,7 @@ export default function BookingForm() {
                             </Button>
                           </FormControl>
                         </PopoverTrigger>
-                        <PopoverContent className="w-auto p-0" align="start">
+                        <PopoverContent className="w-auto p-0 z-50 overflow-visible" align="start">
                           <Calendar
                             mode="single"
                             selected={field.value}
@@ -777,6 +779,8 @@ export default function BookingForm() {
                               date < new Date(new Date().setHours(0, 0, 0, 0))
                             }
                             initialFocus
+                            fixedWeeks
+                            ISOWeek
                           />
                         </PopoverContent>
                       </Popover>

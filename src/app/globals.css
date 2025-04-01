@@ -98,44 +98,6 @@
   }
 }
 
-/* Специальные адаптации для конкретных разрешений */
-/* Для экранов 320px - 359px */
-@media (min-width: 320px) and (max-width: 359px) {
-  .vehicles-tabs-list {
-    gap: 0.25rem;
-    padding: 1px;
-    justify-content: flex-start;
-  }
-
-  .vehicle-tab-item {
-    min-width: 54px;
-    padding: 0.2rem 0.25rem;
-    margin: 1px;
-  }
-
-  .vehicle-tab-text {
-    font-size: 0.62rem;
-    margin-left: 1px;
-  }
-
-  .vehicle-tab-icon {
-    width: 0.6rem;
-    height: 0.6rem;
-    margin-right: 1px;
-  }
-
-  /* Уменьшаем кнопки прокрутки для очень узких экранов */
-  .vehicles-tabs-container button {
-    width: 20px;
-    height: 20px;
-  }
-
-  .vehicles-tabs-container button svg {
-    width: 12px;
-    height: 12px;
-  }
-}
-
 /* Общие анимации */
 @keyframes fadeIn {
   from { opacity: 0; }
@@ -439,7 +401,7 @@
   z-index: 0;
 }
 
-/* Дополнительные улучшения для адаптивности */
+/* Дополнительные улучшения для адаптивности - ТОЛЬКО ДЛЯ МОБИЛЬНЫХ УСТРОЙСТВ */
 @media (max-width: 640px) {
   .vehicles-tab-active {
     padding: 0.5rem 0.75rem;
@@ -454,7 +416,7 @@
     width: 40px;
   }
 
-  /* Общие стили для scroll-панелей вкладок */
+  /* Общие стили для scroll-панелей вкладок на мобильных */
   div[role="tablist"] {
     overflow-x: auto;
     flex-wrap: nowrap;
@@ -486,7 +448,7 @@
     margin-top: 0.5rem;
   }
 
-  /* Дополнительные стили для адаптации кнопок vehicles */
+  /* Дополнительные стили для адаптации кнопок vehicles - ТОЛЬКО ДЛЯ МОБИЛЬНЫХ */
   .vehicles-tabs-list {
     display: flex;
     overflow-x: auto;
@@ -504,6 +466,78 @@
   .vehicle-tab-item {
     flex: 0 0 auto;
     min-width: 80px;
+  }
+
+  /* Стили для кнопок прокрутки - ТОЛЬКО ДЛЯ МОБИЛЬНЫХ */
+  .vehicles-tabs-container {
+    -webkit-overflow-scrolling: touch;
+    position: relative;
+  }
+
+  .vehicles-tabs-container button {
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+    transition: all 0.2s ease;
+    width: 24px;
+    height: 24px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 20;
+  }
+
+  .vehicles-tabs-container button:hover {
+    background: rgba(255, 255, 255, 0.95);
+    transform: translateY(-1px);
+    box-shadow: 0 3px 10px rgba(0, 0, 0, 0.2);
+  }
+
+  .dark .vehicles-tabs-container button {
+    background: rgba(50, 50, 60, 0.8);
+  }
+
+  .dark .vehicles-tabs-container button:hover {
+    background: rgba(60, 60, 70, 0.95);
+  }
+
+  /* Правый градиент - ТОЛЬКО ДЛЯ МОБИЛЬНЫХ */
+  .vehicles-tabs-container::after {
+    content: '';
+    position: absolute;
+    right: 0;
+    top: 0;
+    height: 100%;
+    width: 20px;
+    background: linear-gradient(to right, rgba(255,255,255,0), rgba(255,255,255,0.85));
+    pointer-events: none;
+    z-index: 10;
+  }
+
+  /* Левый градиент - ТОЛЬКО ДЛЯ МОБИЛЬНЫХ */
+  .vehicles-tabs-container::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 0;
+    height: 100%;
+    width: 20px;
+    background: linear-gradient(to left, rgba(255,255,255,0), rgba(255,255,255,0.85));
+    pointer-events: none;
+    z-index: 10;
+    opacity: 0; /* По умолчанию скрыт */
+    transition: opacity 0.3s ease;
+  }
+
+  /* Показываем левый градиент, когда можно прокрутить влево */
+  .vehicles-tabs-container.can-scroll-left::before {
+    opacity: 1;
+  }
+
+  .dark .vehicles-tabs-container::after {
+    background: linear-gradient(to right, rgba(31,41,55,0), rgba(31,41,55,0.85));
+  }
+
+  .dark .vehicles-tabs-container::before {
+    background: linear-gradient(to left, rgba(31,41,55,0), rgba(31,41,55,0.85));
   }
 }
 
@@ -533,15 +567,24 @@
     height: 0.7rem;
   }
 
+  .vehicle-tab-item {
+    min-width: 70px;
+    padding: 0.3rem 0.4rem;
+  }
+}
+
+/* Специальные адаптации для конкретных разрешений - ТОЛЬКО ДЛЯ МОБИЛЬНЫХ*/
+/* Для экранов 320px - 359px */
+@media (min-width: 320px) and (max-width: 359px) {
   .vehicles-tabs-list {
-    gap: 0.3rem;
+    gap: 0.25rem;
     padding: 1px;
     justify-content: flex-start;
   }
 
   .vehicle-tab-item {
-    min-width: 58px;
-    padding: 0.25rem 0.3rem;
+    min-width: 54px;
+    padding: 0.2rem 0.25rem;
     margin: 1px;
   }
 
@@ -551,9 +594,20 @@
   }
 
   .vehicle-tab-icon {
-    width: 0.62rem;
-    height: 0.62rem;
+    width: 0.6rem;
+    height: 0.6rem;
     margin-right: 1px;
+  }
+
+  /* Уменьшаем кнопки прокрутки для очень узких экранов */
+  .vehicles-tabs-container button {
+    width: 20px;
+    height: 20px;
+  }
+
+  .vehicles-tabs-container button svg {
+    width: 12px;
+    height: 12px;
   }
 }
 
@@ -629,23 +683,23 @@
 /* Для экранов 480px - 639px */
 @media (min-width: 480px) and (max-width: 639px) {
   .vehicles-tabs-list {
-    gap: 0.7rem;
+    gap: 0.6rem;
     justify-content: flex-start;
   }
 
   .vehicle-tab-item {
-    min-width: 80px;
+    min-width: 75px;
     padding: 0.4rem 0.5rem;
     margin: 1px;
   }
 
   .vehicle-tab-text {
-    font-size: 0.78rem;
+    font-size: 0.76rem;
   }
 
   .vehicle-tab-icon {
-    width: 0.78rem;
-    height: 0.78rem;
+    width: 0.76rem;
+    height: 0.76rem;
   }
 }
 
@@ -660,74 +714,3 @@
 .delay-800 { animation-delay: 800ms; }
 .delay-900 { animation-delay: 900ms; }
 .delay-1000 { animation-delay: 1000ms; }
-
-.vehicles-tabs-container {
-  -webkit-overflow-scrolling: touch;
-  position: relative;
-}
-
-/* Стили для кнопок прокрутки */
-.vehicles-tabs-container button {
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
-  transition: all 0.2s ease;
-  width: 24px;
-  height: 24px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  z-index: 20;
-}
-
-.vehicles-tabs-container button:hover {
-  background: rgba(255, 255, 255, 0.95);
-  transform: translateY(-1px);
-  box-shadow: 0 3px 10px rgba(0, 0, 0, 0.2);
-}
-
-.dark .vehicles-tabs-container button {
-  background: rgba(50, 50, 60, 0.8);
-}
-
-.dark .vehicles-tabs-container button:hover {
-  background: rgba(60, 60, 70, 0.95);
-}
-
-.vehicles-tabs-container::after {
-  content: '';
-  position: absolute;
-  right: 0;
-  top: 0;
-  height: 100%;
-  width: 15px;
-  background: linear-gradient(to right, rgba(255,255,255,0), rgba(255,255,255,0.7));
-  pointer-events: none;
-  z-index: 10;
-}
-
-.dark .vehicles-tabs-container::after {
-  background: linear-gradient(to right, rgba(31,41,55,0), rgba(31,41,55,0.7));
-}
-
-/* Левый градиент */
-.vehicles-tabs-container::before {
-  content: '';
-  position: absolute;
-  left: 0;
-  top: 0;
-  height: 100%;
-  width: 20px;
-  background: linear-gradient(to left, rgba(255,255,255,0), rgba(255,255,255,0.85));
-  pointer-events: none;
-  z-index: 10;
-  opacity: 0; /* По умолчанию скрыт */
-  transition: opacity 0.3s ease;
-}
-
-/* Показываем левый градиент, когда можно прокрутить влево */
-.vehicles-tabs-container.can-scroll-left::before {
-  opacity: 1;
-}
-
-.dark .vehicles-tabs-container::before {
-  background: linear-gradient(to left, rgba(31,41,55,0), rgba(31,41,55,0.85));
-}

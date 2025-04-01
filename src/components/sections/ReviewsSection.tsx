@@ -2,8 +2,9 @@
 
 import { useRef, useState, useEffect } from 'react'
 import { motion } from 'framer-motion'
-import { Star, ChevronLeft, ChevronRight, Quote } from 'lucide-react'
+import { Star, ChevronLeft, ChevronRight, Quote, MessageSquare } from 'lucide-react'
 import { Button } from '@/components/ui/button'
+import Link from 'next/link'
 
 // Тип для отзыва из API
 interface Review {
@@ -41,13 +42,13 @@ function ReviewCard({ review }: { review: Review }) {
     'https://images.unsplash.com/photo-1580489944761-15a19d654956?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=2061&q=80',
     'https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=2187&q=80',
   ]
-  
+
   // Выбираем случайное fallback изображение на основе ID отзыва
   const fallbackImage = fallbackImages[review.id % fallbackImages.length]
-  
+
   // Форматируем дату для отображения
   const formattedDate = new Date(review.createdAt).toLocaleDateString('ru-RU')
-  
+
   return (
     <motion.div
       className="bg-white dark:bg-gray-800 rounded-lg shadow-lg p-6 md:p-8 h-full review-card"
@@ -99,16 +100,16 @@ export default function ReviewsSection() {
       try {
         setLoading(true)
         const response = await fetch('/api/reviews')
-        
+
         if (!response.ok) {
           throw new Error('Failed to fetch reviews')
         }
-        
+
         const data = await response.json()
-        
+
         // Фильтруем только опубликованные отзывы
         const publishedReviews = data.filter((review: Review) => review.isPublished)
-        
+
         setReviews(publishedReviews)
       } catch (err) {
         console.error('Error loading reviews:', err)
@@ -117,7 +118,7 @@ export default function ReviewsSection() {
         setLoading(false)
       }
     }
-    
+
     fetchReviews()
   }, [])
 
@@ -218,6 +219,18 @@ export default function ReviewsSection() {
                 </Button>
               </div>
             )}
+
+            {/* Кнопка "Смотреть отзывы" */}
+            <div className="text-center mt-10">
+              <Link href="/reviews">
+                <Button className="btn-gradient text-white font-medium px-6 py-3 rounded-full group">
+                  <span className="flex items-center">
+                    <MessageSquare className="w-5 h-5 mr-2 group-hover:animate-pulse" />
+                    Смотреть отзывы
+                  </span>
+                </Button>
+              </Link>
+            </div>
           </>
         )}
       </div>

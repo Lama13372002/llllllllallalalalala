@@ -4,6 +4,7 @@ import Link from 'next/link'
 import Image from 'next/image'
 import { useState, useEffect } from 'react'
 import { Menu, X, Phone } from 'lucide-react'
+import { FaInstagram, FaTelegram, FaWhatsapp } from 'react-icons/fa'
 import { Button } from '@/components/ui/button'
 import { Dialog, DialogContent, DialogTrigger, DialogTitle } from '@/components/ui/dialog'
 import BookingForm from '@/components/forms/BookingForm'
@@ -79,6 +80,37 @@ export default function Header() {
 
         {/* Contact & Book Button */}
         <div className="hidden md:flex items-center space-x-4">
+          {/* Social Media Icons */}
+          <div className="flex space-x-2 mr-4">
+            <a
+              href={settings.instagramLink}
+              className="bg-pink-600 hover:bg-pink-700 p-1.5 rounded-full transition-colors"
+              aria-label="Instagram"
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              <FaInstagram className="w-3.5 h-3.5 text-white" />
+            </a>
+            <a
+              href={settings.telegramLink}
+              className="bg-blue-500 hover:bg-blue-600 p-1.5 rounded-full transition-colors"
+              aria-label="Telegram"
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              <FaTelegram className="w-3.5 h-3.5 text-white" />
+            </a>
+            <a
+              href={settings.whatsappLink}
+              className="bg-green-600 hover:bg-green-700 p-1.5 rounded-full transition-colors"
+              aria-label="WhatsApp"
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              <FaWhatsapp className="w-3.5 h-3.5 text-white" />
+            </a>
+          </div>
+
           <a
             href={`tel:${settings.phone.replace(/\s+/g, '')}`}
             className="flex items-center text-sm font-medium text-gray-700 dark:text-gray-200 hover:text-primary dark:hover:text-primary transition-colors"
@@ -132,6 +164,38 @@ export default function Header() {
                   {link.name}
                 </Link>
               ))}
+
+              {/* Social Media Icons for mobile */}
+              <div className="flex space-x-3 py-2">
+                <a
+                  href={settings.instagramLink}
+                  className="bg-pink-600 hover:bg-pink-700 p-2 rounded-full transition-colors"
+                  aria-label="Instagram"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  <FaInstagram className="w-4 h-4 text-white" />
+                </a>
+                <a
+                  href={settings.telegramLink}
+                  className="bg-blue-500 hover:bg-blue-600 p-2 rounded-full transition-colors"
+                  aria-label="Telegram"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  <FaTelegram className="w-4 h-4 text-white" />
+                </a>
+                <a
+                  href={settings.whatsappLink}
+                  className="bg-green-600 hover:bg-green-700 p-2 rounded-full transition-colors"
+                  aria-label="WhatsApp"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  <FaWhatsapp className="w-4 h-4 text-white" />
+                </a>
+              </div>
+
               <a
                 href={`tel:${settings.phone.replace(/\s+/g, '')}`}
                 className="flex items-center text-sm font-medium text-gray-700 dark:text-gray-200 hover:text-primary dark:hover:text-primary transition-colors"

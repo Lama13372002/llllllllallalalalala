@@ -6,6 +6,8 @@ import { motion } from 'framer-motion'
 import { Dialog, DialogContent, DialogTrigger, DialogTitle } from '@/components/ui/dialog'
 import { Button } from '@/components/ui/button'
 import { Clock, ArrowRight, X, ArrowLeft } from 'lucide-react'
+import Header from '@/components/layout/Header'
+import Footer from '@/components/layout/Footer'
 
 type BlogPost = {
   id: number
@@ -139,38 +141,42 @@ export default function BlogPage() {
   }, [])
 
   return (
-    <div className="min-h-screen">
-      <div className="container mx-auto px-4 py-20">
-        <div className="mb-10 flex items-center">
-          <Link href="/">
-            <Button variant="outline" className="group mr-4">
-              <ArrowLeft className="mr-2 w-4 h-4 group-hover:-translate-x-1 transition-transform" />
-              <span>На главную</span>
-            </Button>
-          </Link>
-          <h1 className="text-3xl md:text-4xl font-bold">Блог о путешествиях</h1>
-        </div>
+    <>
+      <Header />
+      <div className="min-h-screen">
+        <div className="container mx-auto px-4 py-20">
+          <div className="mb-10 flex items-center">
+            <Link href="/">
+              <Button variant="outline" className="group mr-4">
+                <ArrowLeft className="mr-2 w-4 h-4 group-hover:-translate-x-1 transition-transform" />
+                <span>На главную</span>
+              </Button>
+            </Link>
+            <h1 className="text-3xl md:text-4xl font-bold">Блог о путешествиях</h1>
+          </div>
 
-        {isLoading ? (
-          <div className="flex justify-center py-12">
-            <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-500"></div>
-          </div>
-        ) : error ? (
-          <div className="p-4 rounded-md bg-red-50 text-red-700">
-            {error}
-          </div>
-        ) : blogPosts.length === 0 ? (
-          <div className="text-center py-12 border rounded-md">
-            <p className="text-gray-500 text-xl">Скоро здесь появятся интересные статьи</p>
-          </div>
-        ) : (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-            {blogPosts.map((post) => (
-              <BlogPost key={post.id} post={post} />
-            ))}
-          </div>
-        )}
+          {isLoading ? (
+            <div className="flex justify-center py-12">
+              <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-500"></div>
+            </div>
+          ) : error ? (
+            <div className="p-4 rounded-md bg-red-50 text-red-700">
+              {error}
+            </div>
+          ) : blogPosts.length === 0 ? (
+            <div className="text-center py-12 border rounded-md">
+              <p className="text-gray-500 text-xl">Скоро здесь появятся интересные статьи</p>
+            </div>
+          ) : (
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+              {blogPosts.map((post) => (
+                <BlogPost key={post.id} post={post} />
+              ))}
+            </div>
+          )}
+        </div>
       </div>
-    </div>
+      <Footer />
+    </>
   )
 }

@@ -181,14 +181,15 @@ export default function VehiclesSection() {
 
   // Функция для получения радиуса в зависимости от ширины экрана и количества элементов
   const getResponsiveRadius = (totalItems: number, width: number) => {
+    // Уменьшаем радиус для мобильных устройств - это решит проблему смещения вправо
     if (width <= 320) {
-      return Math.min(100, 80 + (totalItems * 3));
+      return Math.min(90, 70 + (totalItems * 3));
     } else if (width <= 375) {
-      return Math.min(120, 100 + (totalItems * 3));
+      return Math.min(110, 90 + (totalItems * 3));
     } else if (width <= 414) {
-      return Math.min(140, 120 + (totalItems * 4));
+      return Math.min(130, 110 + (totalItems * 4));
     } else if (width <= 640) {
-      return Math.min(150, 130 + (totalItems * 4));
+      return Math.min(140, 120 + (totalItems * 4));
     } else {
       return Math.min(160, 130 + (totalItems * 5));
     }
@@ -427,7 +428,6 @@ export default function VehiclesSection() {
                       const baseRadius = getResponsiveRadius(totalItems, windowWidth);
 
                       // Вычисляем координаты X и Y для позиционирования
-                      // Исправляем смещение кнопок, центрируя круг относительно центра экрана
                       const x = Math.cos(angle) * baseRadius;
                       const y = Math.sin(angle) * baseRadius;
 
@@ -440,9 +440,9 @@ export default function VehiclesSection() {
                           key={vehicle.id}
                           className={`vehicle-circle-item absolute z-10 ${activeVehicle === vehicle.id ? 'active' : ''}`}
                           style={{
-                            left: `50%`,
-                            top: `50%`,
-                            transform: `translate(-50%, -50%) translate(${x}px, ${y}px)`
+                            left: `calc(50% + ${x}px)`,
+                            top: `calc(50% + ${y}px)`,
+                            transform: `translate(-50%, -50%)`
                           }}
                           initial={{ scale: 0, opacity: 0 }}
                           animate={{

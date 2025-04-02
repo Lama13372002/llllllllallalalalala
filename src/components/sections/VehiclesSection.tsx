@@ -384,11 +384,11 @@ export default function VehiclesSection() {
                       return (
                         <motion.button
                           key={vehicle.id}
-                          className="vehicle-circle-item absolute z-10"
+                          className={`vehicle-circle-item absolute z-10 ${activeVehicle === vehicle.id ? 'active' : ''}`}
                           style={{
-                            left: "50%",
-                            top: "50%",
-                            transform: `translate(calc(-50% + ${x}px), calc(-50% + ${y}px))`
+                            left: `calc(50% + ${x}px)`,
+                            top: `calc(50% + ${y}px)`,
+                            transform: `translate(-50%, -50%)`
                           }}
                           initial={{ scale: 0, opacity: 0 }}
                           animate={{

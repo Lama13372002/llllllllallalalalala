@@ -57,17 +57,17 @@ export default function Header() {
               alt={settings.companyName}
               width={150}
               height={40}
-              className="h-10 w-auto object-contain mr-2"
+              className="h-10 w-auto object-contain mr-2 custom-logo"
               priority
             />
-            <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-600 to-indigo-700 hidden sm:inline text-sm font-medium">
+            <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-600 to-indigo-700 hidden sm:inline text-sm font-medium company-name">
               {settings.companyName}
             </span>
           </div>
         </Link>
 
         {/* Desktop Navigation */}
-        <nav className="hidden md:flex items-center space-x-1 ml-4">
+        <nav className="hidden md:flex items-center space-x-1 ml-4 main-nav">
           {navLinks.slice(0, 7).map((link) => (
             <Link
               key={link.name}
@@ -80,9 +80,9 @@ export default function Header() {
         </nav>
 
         {/* Contact & Book Button */}
-        <div className="hidden md:flex items-center space-x-4 ml-2">
+        <div className="hidden md:flex items-center space-x-4 ml-2 action-buttons">
           {/* Social Media Icons */}
-          <div className="flex space-x-2 mr-4">
+          <div className="flex space-x-2 mr-4 social-icons">
             <a
               href={settings.instagramLink}
               className="bg-pink-600 hover:bg-pink-700 p-1.5 rounded-full transition-colors"
@@ -114,7 +114,7 @@ export default function Header() {
 
           <a
             href={`tel:${settings.phone.replace(/\s+/g, '')}`}
-            className="flex items-center text-sm font-medium text-gray-700 dark:text-gray-200 hover:text-primary dark:hover:text-primary transition-colors"
+            className="flex items-center text-sm font-medium text-gray-700 dark:text-gray-200 hover:text-primary dark:hover:text-primary transition-colors phone-link"
           >
             <Phone className="w-4 h-4 mr-2 animate-pulse" />
             <span>{settings.phone}</span>
@@ -122,7 +122,7 @@ export default function Header() {
 
           <Dialog>
             <DialogTrigger asChild>
-              <Button className="btn-gradient text-white font-medium">
+              <Button className="btn-gradient text-white font-medium book-button">
                 Заказать трансфер
               </Button>
             </DialogTrigger>
@@ -222,6 +222,123 @@ export default function Header() {
           </div>
         </div>
       )}
+
+      {/* Добавим стили для адаптации шапки под указанные разрешения */}
+      <style jsx global>{`
+        /* Адаптация для разрешения 1024x600 */
+        @media (width: 1024px) and (height: 600px) {
+          .custom-logo {
+            height: 2.25rem; /* Уменьшаем размер логотипа */
+            width: auto;
+          }
+          .company-name {
+            font-size: 0.75rem; /* Уменьшаем размер текста */
+          }
+          .main-nav {
+            gap: 0;
+          }
+          .main-nav .nav-link {
+            padding: 0.5rem 0.5rem;
+            font-size: 0.7rem;
+          }
+          .action-buttons {
+            margin-left: 0.5rem;
+          }
+          .social-icons {
+            margin-right: 0.5rem;
+          }
+          .social-icons a {
+            padding: 0.25rem;
+          }
+          .social-icons svg {
+            width: 0.75rem;
+            height: 0.75rem;
+          }
+          .phone-link {
+            font-size: 0.7rem;
+          }
+          .phone-link svg {
+            width: 0.75rem;
+            height: 0.75rem;
+            margin-right: 0.25rem;
+          }
+          .book-button {
+            font-size: 0.7rem;
+            padding: 0.25rem 0.5rem;
+          }
+        }
+
+        /* Адаптация для разрешения 1024x768 */
+        @media (width: 1024px) and (height: 768px) {
+          .custom-logo {
+            height: 2.5rem;
+            width: auto;
+          }
+          .company-name {
+            font-size: 0.8rem;
+          }
+          .main-nav {
+            gap: 0;
+          }
+          .main-nav .nav-link {
+            padding: 0.5rem 0.75rem;
+            font-size: 0.75rem;
+          }
+          .social-icons a {
+            padding: 0.3rem;
+          }
+          .social-icons svg {
+            width: 0.8rem;
+            height: 0.8rem;
+          }
+        }
+
+        /* Адаптация для разрешения 960x600 */
+        @media (width: 960px) and (height: 600px) {
+          .custom-logo {
+            height: 2rem;
+            width: auto;
+          }
+          .company-name {
+            font-size: 0.7rem;
+          }
+          .main-nav {
+            gap: 0;
+            margin-left: 0.5rem;
+          }
+          .main-nav .nav-link {
+            padding: 0.25rem 0.4rem;
+            font-size: 0.65rem;
+          }
+          .action-buttons {
+            margin-left: 0.25rem;
+            gap: 0.5rem;
+          }
+          .social-icons {
+            margin-right: 0.25rem;
+            gap: 0.25rem;
+          }
+          .social-icons a {
+            padding: 0.2rem;
+          }
+          .social-icons svg {
+            width: 0.7rem;
+            height: 0.7rem;
+          }
+          .phone-link {
+            font-size: 0.65rem;
+          }
+          .phone-link svg {
+            width: 0.7rem;
+            height: 0.7rem;
+            margin-right: 0.25rem;
+          }
+          .book-button {
+            font-size: 0.65rem;
+            padding: 0.25rem 0.5rem;
+          }
+        }
+      `}</style>
     </header>
   )
 }

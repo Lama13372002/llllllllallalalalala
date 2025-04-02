@@ -836,9 +836,6 @@ section#reviews button:focus {
   width: 350px;
   height: 350px;
   margin: 0 auto;
-  display: flex;
-  align-items: center;
-  justify-content: center;
 }
 
 .vehicle-circle-selector::before {
@@ -855,21 +852,20 @@ section#reviews button:focus {
 }
 
 .vehicle-circle-item {
-  cursor: pointer;
-  transition: all 0.3s ease;
+  transition: all 0.3s ease-in-out;
 }
 
-.vehicle-circle-item.active::after {
-  content: '';
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  width: 150px;
-  height: 2px;
-  background: linear-gradient(90deg, transparent, hsl(var(--primary)), transparent);
-  transform-origin: left;
-  z-index: -1;
-  animation: pulse 2s infinite;
+.vehicle-circle-item div {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.3s ease-in-out;
+}
+
+.vehicle-circle-item.active div {
+  border: 2px solid var(--primary-color);
+  box-shadow: 0 0 15px rgba(var(--primary-rgb), 0.3);
 }
 
 /* Улучшения для табов автомобилей */
@@ -976,52 +972,86 @@ section#reviews button:focus {
 
 /* Стили для карусели автомобилей */
 .vehicle-circle-selector {
-  width: 320px;
-  height: 320px;
+  width: 100%;
+  max-width: 400px;
+  height: 400px;
   position: relative;
-  margin: 2rem auto;
+  margin: 0 auto;
 }
 
-@media (max-width: 640px) {
+@media (max-width: 414px) {
   .vehicle-circle-selector {
-    width: 280px;
+    max-width: 320px;
+    height: 320px;
+  }
+
+  .vehicle-circle-item div {
+    width: 18vw !important;
+    height: 18vw !important;
+    max-width: 80px;
+    max-height: 80px;
+  }
+
+  .vehicle-circle-item .w-6 {
+    width: 1rem;
+    height: 1rem;
+  }
+
+  .vehicle-circle-item span {
+    font-size: 0.7rem;
+  }
+}
+
+@media (max-width: 375px) {
+  .vehicle-circle-selector {
+    max-width: 280px;
     height: 280px;
-    transform: scale(0.85);
+  }
+
+  .vehicle-circle-item div {
+    width: 16vw !important;
+    height: 16vw !important;
   }
 }
 
-/* Анимация пульсации центрального круга */
-.vehicle-circle-selector .absolute.top-1\/2 {
-  animation: pulse 3s infinite alternate;
-}
-
-@keyframes pulse {
-  0% {
-    box-shadow: 0 0 0 0 rgba(var(--primary), 0.3);
+@media (max-width: 320px) {
+  .vehicle-circle-selector {
+    max-width: 240px;
+    height: 240px;
   }
-  100% {
-    box-shadow: 0 0 15px 5px rgba(var(--primary), 0.3);
+
+  .vehicle-circle-item div {
+    width: 14vw !important;
+    height: 14vw !important;
+    min-width: 50px;
+    min-height: 50px;
+    padding: 2px;
+  }
+
+  .vehicle-circle-item span {
+    font-size: 0.65rem;
+    line-height: 1;
+  }
+
+  .vehicle-circle-item .w-4 {
+    width: 0.8rem;
+    height: 0.8rem;
+    margin-bottom: 2px;
   }
 }
 
-/* Улучшение стилей для кнопки "Выбрать другой класс" */
-.btn-secondary {
-  background-color: rgb(var(--primary) / 0.1);
-  color: rgb(var(--primary));
-  transition: all 0.3s ease;
+/* Анимация активной кнопки */
+.vehicle-circle-item.active {
+  z-index: 20 !important;
 }
 
-.btn-secondary:hover {
-  background-color: rgb(var(--primary) / 0.2);
-  transform: translateY(-2px);
+/* Исправление отображения для очень маленьких экранов */
+@media (max-height: 600px) and (max-width: 375px) {
+  .vehicle-circle-selector {
+    max-width: 260px;
+    height: 260px;
+    transform: scale(0.9);
+  }
 }
 
-/* Анимации для автомобильных характеристик */
-.grid.grid-cols-1.xs\:grid-cols-2 > div {
-  transition: all 0.3s ease;
-}
-
-.grid.grid-cols-1.xs\:grid-cols-2 > div:hover {
-  background-color: rgb(var(--primary) / 0.05);
-  transform: translateX(5px);
-}
+/* Конец файла */

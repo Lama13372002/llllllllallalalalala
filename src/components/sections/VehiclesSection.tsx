@@ -1,11 +1,11 @@
 'use client'
 
 import { useState, useEffect, useRef } from 'react'
-import { motion } from 'framer-motion'
+import { motion, AnimatePresence } from 'framer-motion'
 import { Dialog, DialogContent, DialogTrigger } from '@/components/ui/dialog'
 import { Button } from '@/components/ui/button'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
-import { Car, Users, Briefcase, Wifi, Leaf, Coffee, Check, ChevronRight, ChevronLeft } from 'lucide-react'
+import { Car, Users, Briefcase, Wifi, Leaf, Coffee, Check, ChevronRight, ChevronLeft, ArrowUp, ArrowDown } from 'lucide-react'
 import BookingForm from '@/components/forms/BookingForm'
 
 // Тип для транспортных средств из API
@@ -128,6 +128,7 @@ export default function VehiclesSection() {
   const [error, setError] = useState<string | null>(null)
   const [showLeftScroll, setShowLeftScroll] = useState(false)
   const [showRightScroll, setShowRightScroll] = useState(true)
+  const [showMobileSelector, setShowMobileSelector] = useState(false)
 
   const tabsListRef = useRef<HTMLDivElement>(null)
 
@@ -327,6 +328,62 @@ export default function VehiclesSection() {
         <div className="flex flex-col">
           <div className="relative">
             <Tabs defaultValue={vehicles[0]?.id} onValueChange={setActiveVehicle} className="w-full">
+              {/* Добавляем переключатель в виде кругового селектора (для средних и больших экранов) */}
+              <div className="hidden md:block mb-8">
+                <div className="vehicle-class-selector max-w-4xl mx-auto px-4">
+                  <div className="flex justify-center">
+                    <div className="vehicle-circle-selector relative">
+                      {vehicles.map((vehicle, index) => {
+                        // Вычисляем положение для каждой кнопки на круге
+                        const angleStep = (2 * Math.PI) / vehicles.length;
+                        const angle = index * angleStep - Math.PI / 2; // Начинаем с верхней позиции
+                        const radius = 150; // Радиус круга
+                        const x = Math.cos(angle) * radius;
+                        const y = Math.sin(angle) * radius;
+
+                        // Определяем, активна ли текущая кнопка
+                        const isActive = vehicle.id === activeVehicle;
+
+                        return (
+                          <TabsTrigger
+                            key={vehicle.id}
+                            value={vehicle.id}
+                            className={`vehicle-circle-item absolute z-10 ${isActive ? 'active' : ''}`}
+                            style={{
+                              transform: `translate(${x}px, ${y}px)`,
+                              transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)'
+                            }}
+                          >
+                            <div
+                              className={`flex flex-col items-center justify-center w-24 h-24 rounded-full shadow-md transition-all
+                                ${isActive
+                                  ? 'bg-primary text-white scale-110 shadow-lg z-20'
+                                  : 'bg-white dark:bg-gray-700 text-gray-800 dark:text-gray-200 hover:scale-105'
+                                }`}
+                            >
+                              <Car className={`w-6 h-6 mb-1 ${isActive ? 'text-white' : 'text-primary'}`} />
+                              <span className="text-sm font-medium whitespace-nowrap">{vehicle.name}</span>
+                              {vehicle.name === 'VIP' && (
+                                <span className="absolute -top-2 -right-2 bg-red-500 text-white text-[10px] px-1.5 py-0.5 rounded-full animate-pulse">
+                                  New
+                                </span>
+                              )}
+                            </div>
+                          </TabsTrigger>
+                        );
+                      })}
+                      <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-28 h-28 rounded-full bg-white dark:bg-gray-800 shadow-md flex items-center justify-center">
+                        <div className="text-center">
+                          <Car className="w-8 h-8 text-primary mx-auto mb-1" />
+                          <span className="text-sm font-medium text-gray-700 dark:text-gray-300">Выберите<br/>класс</span>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              {/* Стандартный линейный переключатель (отображается на всех экранах) */}
               <div
                 className="sticky top-0 z-30 bg-white/95 dark:bg-gray-800/95 backdrop-blur-sm shadow-sm py-4 -mx-4 px-4 sm:mx-0 sm:px-0 sm:py-3 overflow-x-auto vehicles-tabs-container"
               >
@@ -344,17 +401,49 @@ export default function VehiclesSection() {
 
                   <div
                     ref={tabsListRef}
-                    className="overflow-x-auto pb-1"
+                    className="overflow-x-auto pb-1 relative scrollbar-hide"
                   >
                     <TabsList className="sm:grid sm:grid-cols-3 lg:grid-cols-6 sm:gap-2 sm:p-2 lg:p-1 flex w-full max-w-full mx-auto gap-1.5 p-1.5 min-w-max vehicles-tabs-list">
                       {vehicles.map((vehicle) => (
                         <TabsTrigger
                           key={vehicle.id}
                           value={vehicle.id}
-                          className="flex items-center justify-center gap-1 text-xs sm:text-sm py-1.5 px-1.5 sm:py-3 sm:px-2 rounded-md transition-all duration-300 shadow-sm hover:shadow-md hover:-translate-y-0.5 data-[state=active]:bg-primary data-[state=active]:text-primary-foreground data-[state=active]:shadow-lg data-[state=active]:scale-105 data-[state=active]:font-medium vehicles-tab-active vehicle-tab-item"
+                          className="flex-grow flex items-center justify-center gap-1 text-xs sm:text-sm py-1.5 px-1.5 sm:py-3 sm:px-2 rounded-md transition-all duration-300 shadow-sm
+                            hover:shadow-md hover:-translate-y-0.5
+                            data-[state=active]:bg-primary data-[state=active]:text-primary-foreground
+                            data-[state=active]:shadow-lg data-[state=active]:scale-105
+                            data-[state=active]:font-medium vehicles-tab-active vehicle-tab-item
+                            relative overflow-hidden"
+                          onClick={() => {
+                            // Добавляем тактильную отдачу при выборе, если поддерживается
+                            if ('vibrate' in navigator) {
+                              navigator.vibrate(50);
+                            }
+
+                            // Плавная прокрутка к выбранной вкладке, чтобы она была видна
+                            if (tabsListRef.current) {
+                              const tabElement = tabsListRef.current.querySelector(`[value="${vehicle.id}"]`);
+                              if (tabElement) {
+                                const tabPosition = tabElement.getBoundingClientRect();
+                                const containerPosition = tabsListRef.current.getBoundingClientRect();
+
+                                // Центрируем вкладку, если она не находится в центре видимой области
+                                if (tabPosition.left < containerPosition.left || tabPosition.right > containerPosition.right) {
+                                  tabsListRef.current.scrollBy({
+                                    left: tabPosition.left - containerPosition.left - (containerPosition.width / 2) + (tabPosition.width / 2),
+                                    behavior: 'smooth'
+                                  });
+                                }
+                              }
+                            }
+                          }}
                         >
                           <Car className="w-3 h-3 sm:w-4 sm:h-4 flex-shrink-0 vehicle-tab-icon" />
                           <span className="whitespace-nowrap font-medium vehicle-tab-text">{vehicle.name}</span>
+
+                          {/* Добавляем подсветку для активной вкладки */}
+                          <span className="absolute bottom-0 left-0 h-1 bg-primary transform scale-x-0 transition-transform duration-300 w-full data-[state=active]:scale-x-100" data-state={activeVehicle === vehicle.id ? 'active' : 'inactive'}></span>
+
                           {vehicle.name === 'VIP' && (
                             <span className="absolute -top-2 -right-2 bg-red-500 text-white text-[10px] px-1.5 py-0.5 rounded-full animate-pulse">
                               New
@@ -374,6 +463,63 @@ export default function VehiclesSection() {
                       <ChevronRight className="w-4 h-4 text-primary" />
                     </button>
                   )}
+                </div>
+              </div>
+
+              {/* Добавляем мобильный селектор в виде выпадающего списка */}
+              <div className="sm:hidden mt-2 mb-4">
+                <div className="vehicle-mobile-selector p-2 bg-gray-50 dark:bg-gray-900 rounded-md shadow-inner mx-4">
+                  <div className="relative">
+                    <div className="flex justify-between items-center p-2 bg-white dark:bg-gray-800 rounded-md shadow-sm" onClick={() => setShowMobileSelector(!showMobileSelector)}>
+                      <div className="flex items-center gap-2">
+                        <Car className="w-4 h-4 text-primary" />
+                        <span className="text-sm font-medium">
+                          {vehicles.find(v => v.id === activeVehicle)?.name || 'Выберите класс'}
+                        </span>
+                      </div>
+                      {showMobileSelector ? <ArrowUp className="w-4 h-4" /> : <ArrowDown className="w-4 h-4" />}
+                    </div>
+
+                    <AnimatePresence>
+                      {showMobileSelector && (
+                        <motion.div
+                          className="absolute top-full left-0 right-0 z-20 mt-1 bg-white dark:bg-gray-800 rounded-md shadow-lg overflow-hidden"
+                          initial={{ opacity: 0, height: 0 }}
+                          animate={{ opacity: 1, height: 'auto' }}
+                          exit={{ opacity: 0, height: 0 }}
+                          transition={{ duration: 0.2 }}
+                        >
+                          {vehicles.map((vehicle) => (
+                            <div
+                              key={vehicle.id}
+                              className={`flex items-center gap-2 p-3 cursor-pointer transition-colors
+                                ${vehicle.id === activeVehicle
+                                  ? 'bg-primary/10 text-primary'
+                                  : 'hover:bg-gray-50 dark:hover:bg-gray-700'
+                                }`}
+                              onClick={() => {
+                                // Эмулируем клик по соответствующей вкладке
+                                const tabElement = document.querySelector(`[value="${vehicle.id}"]`) as HTMLElement;
+                                if (tabElement) {
+                                  tabElement.click();
+                                }
+                                setShowMobileSelector(false);
+
+                                // Добавляем тактильную отдачу при выборе, если поддерживается
+                                if ('vibrate' in navigator) {
+                                  navigator.vibrate(50);
+                                }
+                              }}
+                            >
+                              <Car className={`w-4 h-4 ${vehicle.id === activeVehicle ? 'text-primary' : 'text-gray-500'}`} />
+                              <span className="text-sm">{vehicle.name}</span>
+                              {vehicle.id === activeVehicle && <Check className="w-4 h-4 ml-auto text-primary" />}
+                            </div>
+                          ))}
+                        </motion.div>
+                      )}
+                    </AnimatePresence>
+                  </div>
                 </div>
               </div>
 

@@ -133,12 +133,12 @@ const classIcons: Record<string, React.ReactNode> = {
 
 // Градиенты для карточек разных классов
 const classGradients: Record<string, string> = {
-  'Standart': 'from-blue-500 to-blue-600',
-  'Comfort': 'from-green-500 to-green-600',
-  'Business': 'from-purple-500 to-purple-600',
-  'VIP': 'from-amber-500 to-red-600',
-  'Minivan': 'from-teal-500 to-teal-600',
-  'default': 'from-blue-500 to-blue-600'
+  'Standart': 'from-blue-400 to-blue-600',
+  'Comfort': 'from-emerald-400 to-emerald-600',
+  'Business': 'from-violet-400 to-indigo-600',
+  'VIP': 'from-amber-400 to-rose-600',
+  'Minivan': 'from-teal-400 to-teal-600',
+  'default': 'from-blue-400 to-blue-600'
 }
 
 export default function VehiclesSection() {
@@ -460,7 +460,7 @@ export default function VehiclesSection() {
               {/* New vehicle class selector - card based layout */}
               <div className="vehicle-class-selector max-w-5xl mx-auto px-4 mb-8">
                 <motion.div
-                  className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4"
+                  className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4 md:gap-6 justify-center"
                   initial={{ opacity: 0 }}
                   animate={{ opacity: 1 }}
                   transition={{ duration: 0.5 }}
@@ -473,7 +473,7 @@ export default function VehiclesSection() {
                     return (
                       <motion.div
                         key={vehicle.id}
-                        className={`vehicle-class-card cursor-pointer rounded-xl shadow-md overflow-hidden transition-all duration-300 hover:shadow-lg transform hover:-translate-y-1 ${activeVehicle === vehicle.id ? 'ring-2 ring-primary ring-offset-2' : ''}`}
+                        className={`vehicle-class-card cursor-pointer mx-auto ${activeVehicle === vehicle.id ? 'ring-2 ring-primary ring-offset-2' : ''}`}
                         initial={{ opacity: 0, y: 20 }}
                         animate={{ opacity: 1, y: 0 }}
                         transition={{ delay: index * 0.1, duration: 0.4 }}
@@ -481,23 +481,23 @@ export default function VehiclesSection() {
                         whileHover={{ scale: 1.03 }}
                         whileTap={{ scale: 0.98 }}
                       >
-                        <div className={`h-24 bg-gradient-to-r ${gradient} flex items-center justify-center p-4`}>
-                          <div className="w-10 h-10 text-white">
+                        <div className={`card-gradient bg-gradient-to-r ${gradient}`}>
+                          <div className="card-icon text-white">
                             {icon}
                           </div>
-                        </div>
-                        <div className="p-4 bg-white dark:bg-gray-700 text-center">
-                          <h3 className={`font-semibold ${windowWidth <= 375 ? 'text-sm' : 'text-base'} text-gray-800 dark:text-gray-200`}>
-                            {vehicle.name}
-                          </h3>
-                          <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
-                            {vehicle.price}
-                          </p>
                           {vehicle.name === 'VIP' && (
-                            <span className="absolute top-2 right-2 bg-red-500 text-white text-[10px] px-1.5 py-0.5 rounded-full animate-pulse">
+                            <span className="premium-badge animate-pulse">
                               Premium
                             </span>
                           )}
+                        </div>
+                        <div className="card-content">
+                          <h3 className="vehicle-name text-gray-800 dark:text-gray-200">
+                            {vehicle.name}
+                          </h3>
+                          <p className="vehicle-price">
+                            {vehicle.price}
+                          </p>
                         </div>
                       </motion.div>
                     );

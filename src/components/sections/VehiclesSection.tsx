@@ -5,7 +5,7 @@ import { motion, AnimatePresence } from 'framer-motion'
 import { Dialog, DialogContent, DialogTrigger } from '@/components/ui/dialog'
 import { Button } from '@/components/ui/button'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
-import { Car, Users, Briefcase, Wifi, Leaf, Coffee, Check, ChevronRight, ChevronLeft, ArrowUp, ArrowDown, Undo2 } from 'lucide-react'
+import { Car, Users, Briefcase, Wifi, Leaf, Coffee, Check, ChevronRight, ChevronLeft, ArrowUp, ArrowDown, Undo2, Shield, Star } from 'lucide-react'
 import BookingForm from '@/components/forms/BookingForm'
 
 // Тип для транспортных средств из API
@@ -121,16 +121,36 @@ const featureIcons: Record<string, React.ReactNode> = {
   'Персональный мини-бар': <Coffee className="w-4 h-4" />,
 }
 
+// Иконки для классов транспорта
+const classIcons: Record<string, React.ReactNode> = {
+  'Standart': <Car className="w-full h-full" />,
+  'Comfort': <Car className="w-full h-full" />,
+  'Business': <Briefcase className="w-full h-full" />,
+  'VIP': <Star className="w-full h-full" />,
+  'Minivan': <Users className="w-full h-full" />,
+  'default': <Car className="w-full h-full" />
+}
+
+// Градиенты для карточек разных классов
+const classGradients: Record<string, string> = {
+  'Standart': 'from-blue-500 to-blue-600',
+  'Comfort': 'from-green-500 to-green-600',
+  'Business': 'from-purple-500 to-purple-600',
+  'VIP': 'from-amber-500 to-red-600',
+  'Minivan': 'from-teal-500 to-teal-600',
+  'default': 'from-blue-500 to-blue-600'
+}
+
 export default function VehiclesSection() {
   const [vehicles, setVehicles] = useState<DisplayVehicle[]>([])
   const [activeVehicle, setActiveVehicle] = useState<string>('')
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
-  const [showVehicleDetails, setShowVehicleDetails] = useState(false) // Новое состояние для переключения между каруселью и деталями
+  const [showVehicleDetails, setShowVehicleDetails] = useState(false) // Состояние для переключения между каруселью и деталями
   const [showLeftScroll, setShowLeftScroll] = useState(false)
   const [showRightScroll, setShowRightScroll] = useState(true)
   const [showMobileSelector, setShowMobileSelector] = useState(false)
-  const [windowWidth, setWindowWidth] = useState(typeof window !== 'undefined' ? window.innerWidth : 1024); // Новая переменная состояния для ширины окна
+  const [windowWidth, setWindowWidth] = useState(typeof window !== 'undefined' ? window.innerWidth : 1024)
 
   const tabsListRef = useRef<HTMLDivElement>(null)
 
@@ -178,44 +198,6 @@ export default function VehiclesSection() {
       tabsListRef.current.scrollBy({ left: 100, behavior: 'smooth' })
     }
   }
-
-  // Функция для получения радиуса в зависимости от ширины экрана и количества элементов
-  const getResponsiveRadius = (totalItems: number, width: number) => {
-    // Адаптивный радиус для разных размеров экрана
-    if (width <= 320) {
-      return 90; // Маленькие мобильные экраны
-    } else if (width <= 375) {
-      return 100; // Средние мобильные экраны
-    } else if (width <= 414) {
-      return 110; // Большие мобильные экраны
-    } else if (width <= 640) {
-      return 130; // Планшеты и маленькие десктопы
-    } else {
-      return 160; // Большие экраны
-    }
-  };
-
-  // Функция для получения размера кнопки в зависимости от ширины экрана
-  const getButtonSize = (width: number) => {
-    if (width <= 320) {
-      return 'w-16 h-16';
-    } else if (width <= 375) {
-      return 'w-18 h-18';
-    } else if (width <= 414) {
-      return 'w-20 h-20';
-    } else {
-      return 'w-24 h-24';
-    }
-  };
-
-  // Функция для получения размера иконки в зависимости от ширины экрана
-  const getIconSize = (width: number) => {
-    if (width <= 375) {
-      return 'w-4 h-4';
-    } else {
-      return 'w-6 h-6';
-    }
-  };
 
   // Функция для конвертации данных из БД в формат для отображения
   const formatVehicleData = (dbVehicle: DBVehicle): DisplayVehicle => {
@@ -268,14 +250,80 @@ export default function VehiclesSection() {
           .filter((v: DBVehicle) => v.isActive)
           .map(formatVehicleData)
 
-        setVehicles(activeVehicles)
-
-        // Устанавливаем активную вкладку, если есть транспортные средства
         if (activeVehicles.length > 0) {
+          setVehicles(activeVehicles)
           setActiveVehicle(activeVehicles[0].id)
+        } else {
+          // Если нет активных транспортных средств в БД, используем демо-данные
+          const demoVehicles: DBVehicle[] = [
+            {
+              id: 1,
+              class: 'Standart',
+              brand: 'Toyota',
+              model: 'Camry',
+              year: 2023,
+              seats: 4,
+              description: 'Комфортабельный автомобиль стандартного класса для городских поездок.',
+              imageUrl: null,
+              amenities: 'Кондиционер;Wi-Fi;Бутилированная вода;Зарядные устройства',
+              isActive: true
+            },
+            {
+              id: 2,
+              class: 'Comfort',
+              brand: 'Skoda',
+              model: 'Superb',
+              year: 2023,
+              seats: 4,
+              description: 'Просторный автомобиль комфорт-класса с увеличенным пространством для ног.',
+              imageUrl: null,
+              amenities: 'Климат-контроль;Wi-Fi;Бутилированная вода;Большой багажник',
+              isActive: true
+            },
+            {
+              id: 3,
+              class: 'Business',
+              brand: 'Mercedes-Benz',
+              model: 'E-Class',
+              year: 2023,
+              seats: 4,
+              description: 'Престижный автомобиль бизнес-класса для деловых поездок и встреч.',
+              imageUrl: null,
+              amenities: 'Кожаный салон;Мультизонный климат-контроль;Wi-Fi;Мини-бар',
+              isActive: true
+            },
+            {
+              id: 4,
+              class: 'VIP',
+              brand: 'BMW',
+              model: '7 Series',
+              year: 2023,
+              seats: 4,
+              description: 'Эксклюзивный автомобиль представительского класса для особых случаев.',
+              imageUrl: null,
+              amenities: 'Эксклюзивный кожаный салон;Интеллектуальный климат-контроль;Wi-Fi высокоскоростной;Персональный мини-бар',
+              isActive: true
+            },
+            {
+              id: 5,
+              class: 'Minivan',
+              brand: 'Mercedes-Benz',
+              model: 'V-Class',
+              year: 2023,
+              seats: 7,
+              description: 'Просторный минивэн для комфортной поездки большой группы до 7 человек.',
+              imageUrl: null,
+              amenities: 'Просторный салон;Климат-контроль;Wi-Fi;Большое багажное отделение',
+              isActive: true
+            }
+          ];
+
+          const formattedDemoVehicles = demoVehicles.map(formatVehicleData);
+          setVehicles(formattedDemoVehicles);
+          setActiveVehicle(formattedDemoVehicles[0].id);
         }
       } else {
-        // Если нет данных, используем демо-данные
+        // Если нет данных, отображаем сообщение
         setVehicles([])
         setError('Нет данных об автопарке')
       }
@@ -409,91 +457,52 @@ export default function VehiclesSection() {
               transition={{ duration: 0.4 }}
               className="flex flex-col"
             >
-              {/* Карусель (только круговой селектор) */}
-              <div className="vehicle-class-selector max-w-4xl mx-auto px-4 mb-8 relative">
-                <div className="flex justify-center">
-                  <motion.div
-                    className="vehicle-circle-selector relative"
-                    initial={{ scale: 0.9 }}
-                    animate={{ scale: 1 }}
-                    transition={{ duration: 0.5, type: "spring" }}
-                    style={{
-                      width: windowWidth <= 640 ? '300px' : '350px',
-                      height: windowWidth <= 640 ? '300px' : '350px',
-                      position: 'relative',
-                      margin: '0 auto'
-                    }}
-                  >
-                    {vehicles.map((vehicle, index) => {
-                      // Используем равномерное распределение по кругу
-                      const totalVehicles = vehicles.length;
+              {/* New vehicle class selector - card based layout */}
+              <div className="vehicle-class-selector max-w-5xl mx-auto px-4 mb-8">
+                <motion.div
+                  className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4"
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  transition={{ duration: 0.5 }}
+                >
+                  {vehicles.map((vehicle, index) => {
+                    // Get gradient and icon for this vehicle class
+                    const gradient = classGradients[vehicle.name] || classGradients.default;
+                    const icon = classIcons[vehicle.name] || classIcons.default;
 
-                      // Равномерно распределяем кнопки по полному кругу, начиная с верхней точки
-                      // -Math.PI/2 означает начало с верхней точки (12 часов на циферблате)
-                      const angle = (Math.PI * 2 / totalVehicles) * index - Math.PI / 2;
-
-                      // Получаем радиус круга
-                      const radius = getResponsiveRadius(totalVehicles, windowWidth);
-
-                      // Вычисляем координаты на основе угла и радиуса
-                      // Центрируем круг по центру контейнера
-                      const centerX = '50%';
-                      const centerY = '50%';
-
-                      // Вычисляем смещение относительно центра
-                      const offsetX = Math.cos(angle) * radius;
-                      const offsetY = Math.sin(angle) * radius;
-
-                      // Определяем размер кнопки и иконки в зависимости от ширины экрана
-                      const buttonSize = getButtonSize(windowWidth);
-                      const iconSize = getIconSize(windowWidth);
-
-                      return (
-                        <motion.button
-                          key={vehicle.id}
-                          className={`vehicle-circle-item absolute z-10 ${activeVehicle === vehicle.id ? 'active' : ''}`}
-                          style={{
-                            left: centerX,
-                            top: centerY,
-                            transform: `translate(calc(-50% + ${offsetX}px), calc(-50% + ${offsetY}px))`
-                          }}
-                          initial={{ scale: 0, opacity: 0 }}
-                          animate={{
-                            scale: 1,
-                            opacity: 1,
-                            transition: { delay: index * 0.1, duration: 0.4 }
-                          }}
-                          whileHover={{ scale: 1.1 }}
-                          whileTap={{ scale: 0.95 }}
-                          onClick={() => handleVehicleSelect(vehicle.id)}
-                        >
-                          <div className={`flex flex-col items-center justify-center rounded-full shadow-md bg-white dark:bg-gray-700 text-gray-800 dark:text-gray-200 hover:shadow-lg transition-all duration-300 ${buttonSize}`}>
-                            <Car className={`${iconSize} mb-1 text-primary`} />
-                            <span className={`${windowWidth <= 375 ? 'text-xs' : 'text-sm'} font-medium whitespace-nowrap`}>{vehicle.name}</span>
-                            {vehicle.name === 'VIP' && (
-                              <span className="absolute -top-2 -right-2 bg-red-500 text-white text-[10px] px-1.5 py-0.5 rounded-full animate-pulse">
-                                New
-                              </span>
-                            )}
+                    return (
+                      <motion.div
+                        key={vehicle.id}
+                        className={`vehicle-class-card cursor-pointer rounded-xl shadow-md overflow-hidden transition-all duration-300 hover:shadow-lg transform hover:-translate-y-1 ${activeVehicle === vehicle.id ? 'ring-2 ring-primary ring-offset-2' : ''}`}
+                        initial={{ opacity: 0, y: 20 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        transition={{ delay: index * 0.1, duration: 0.4 }}
+                        onClick={() => handleVehicleSelect(vehicle.id)}
+                        whileHover={{ scale: 1.03 }}
+                        whileTap={{ scale: 0.98 }}
+                      >
+                        <div className={`h-24 bg-gradient-to-r ${gradient} flex items-center justify-center p-4`}>
+                          <div className="w-10 h-10 text-white">
+                            {icon}
                           </div>
-                        </motion.button>
-                      );
-                    })}
-
-                    {/* Центральный круг - размещаем по центру круга */}
-                    <motion.div
-                      className={`absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 ${windowWidth <= 375 ? 'w-20 h-20' : 'w-28 h-28'} rounded-full bg-white dark:bg-gray-800 shadow-md flex items-center justify-center`}
-                      initial={{ scale: 0 }}
-                      animate={{ scale: 1 }}
-                      transition={{ delay: 0.3, type: "spring" }}
-                    >
-                      <div className="text-center">
-                        <Car className={`${windowWidth <= 375 ? 'w-6 h-6' : 'w-8 h-8'} text-primary mx-auto mb-1`} />
-                        <span className={`${windowWidth <= 375 ? 'text-xs' : 'text-sm'} font-medium text-gray-700 dark:text-gray-300`}>Выберите<br/>класс</span>
-                      </div>
-                    </motion.div>
-                  </motion.div>
-                </div>
+                        </div>
+                        <div className="p-4 bg-white dark:bg-gray-700 text-center">
+                          <h3 className={`font-semibold ${windowWidth <= 375 ? 'text-sm' : 'text-base'} text-gray-800 dark:text-gray-200`}>
+                            {vehicle.name}
+                          </h3>
+                          <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
+                            {vehicle.price}
+                          </p>
+                          {vehicle.name === 'VIP' && (
+                            <span className="absolute top-2 right-2 bg-red-500 text-white text-[10px] px-1.5 py-0.5 rounded-full animate-pulse">
+                              Premium
+                            </span>
+                          )}
+                        </div>
+                      </motion.div>
+                    );
+                  })}
+                </motion.div>
               </div>
             </motion.div>
           ) : (

@@ -268,7 +268,6 @@
   border-radius: 10px;
   box-shadow: 0 4px 10px rgba(0, 0, 0, 0.12);
   overflow: hidden;
-  transform-origin: center;
 }
 
 .vehicle-class-card:hover {
@@ -371,6 +370,66 @@
   position: relative;
   overflow: hidden;
   transition: all 0.3s ease;
+}
+
+/* Новые стили для карусели автомобилей */
+.vehicle-carousel-card {
+  position: relative;
+  border-radius: 1rem;
+  transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+  background: rgba(255, 255, 255, 0.02);
+  overflow: hidden;
+}
+
+.vehicle-carousel-card img,
+.vehicle-carousel-card [style*="background-image"] {
+  transition: transform 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.vehicle-carousel-card:hover img,
+.vehicle-carousel-card:hover [style*="background-image"] {
+  transform: scale(1.05);
+}
+
+/* Стили для кнопок-индикаторов выбора класса транспорта */
+.vehicle-selector-button {
+  position: relative;
+  overflow: hidden;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  transform-origin: center;
+  border: none;
+  outline: none;
+}
+
+.vehicle-selector-button:hover {
+  transform: translateY(-2px);
+}
+
+.vehicle-selector-button:active {
+  transform: translateY(0);
+}
+
+.vehicle-selector-button::before {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  height: 3px;
+  transform: scaleX(0);
+  transform-origin: center;
+  transition: transform 0.3s ease;
+  opacity: 0;
+}
+
+.vehicle-selector-button:hover::before {
+  transform: scaleX(1);
+  opacity: 1;
+}
+
+.vehicle-selector-button.active::before {
+  transform: scaleX(1);
+  opacity: 1;
 }
 
 /* Остальные стили для кнопок в блоке автопарка */

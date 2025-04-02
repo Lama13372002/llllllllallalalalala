@@ -181,17 +181,17 @@ export default function VehiclesSection() {
 
   // Функция для получения радиуса в зависимости от ширины экрана и количества элементов
   const getResponsiveRadius = (totalItems: number, width: number) => {
-    // Уменьшаем радиус для мобильных устройств - это решит проблему смещения вправо
+    // Адаптивный радиус для разных размеров экрана
     if (width <= 320) {
-      return Math.min(90, 70 + (totalItems * 3));
+      return 100; // Маленькие мобильные экраны
     } else if (width <= 375) {
-      return Math.min(110, 90 + (totalItems * 3));
+      return 120; // Средние мобильные экраны
     } else if (width <= 414) {
-      return Math.min(130, 110 + (totalItems * 4));
+      return 140; // Большие мобильные экраны
     } else if (width <= 640) {
-      return Math.min(140, 120 + (totalItems * 4));
+      return 160; // Планшеты и маленькие десктопы
     } else {
-      return Math.min(160, 130 + (totalItems * 5));
+      return 180; // Большие экраны
     }
   };
 
@@ -417,36 +417,25 @@ export default function VehiclesSection() {
                     initial={{ scale: 0.9 }}
                     animate={{ scale: 1 }}
                     transition={{ duration: 0.5, type: "spring" }}
+                    style={{ width: '100%', height: windowWidth <= 640 ? 350 : 400, position: 'relative' }}
                   >
                     {vehicles.map((vehicle, index) => {
-                      // Используем фиксированные координаты для позиционирования
-                      // на основе предоставленных данных
-                      let positionX, positionY;
+                      // Используем тригонометрию для расчета позиции в круге
+                      const totalVehicles = vehicles.length;
+                      // Начинаем с верхней точки круга и равномерно распределяем кнопки
+                      const angle = (Math.PI * 2 / totalVehicles) * index - Math.PI / 2;
 
-                      // Фиксированные координаты для каждой кнопки
-                      const fixedPositions = [
-                        { x: 54, y: 704 },   // первая кнопка
-                        { x: 290, y: 483 },  // вторая кнопка
-                        { x: 539, y: 710 },  // третья кнопка
-                        { x: 444, y: 914 },  // четвертая кнопка
-                        { x: 152, y: 919 }   // пятая кнопка
-                      ];
+                      // Получаем радиус круга
+                      const radius = getResponsiveRadius(totalVehicles, windowWidth);
 
-                      // Получаем координаты для текущей кнопки
-                      if (index < fixedPositions.length) {
-                        positionX = fixedPositions[index].x;
-                        positionY = fixedPositions[index].y;
-                      } else {
-                        // Если кнопок больше чем координат, используем последнюю координату
-                        positionX = fixedPositions[fixedPositions.length - 1].x;
-                        positionY = fixedPositions[fixedPositions.length - 1].y;
-                      }
+                      // Вычисляем координаты на основе угла и радиуса
+                      // Центрируем круг по центру контейнера
+                      const centerX = '50%';
+                      const centerY = '50%';
 
-                      // Масштабирование координат в зависимости от размера экрана
-                      // Координаты даны относительно размера экрана ~600px (предполагаемый оригинальный размер)
-                      const scaleFactor = windowWidth / 600;
-                      positionX = positionX * scaleFactor;
-                      positionY = positionY * scaleFactor;
+                      // Вычисляем смещение относительно центра
+                      const offsetX = Math.cos(angle) * radius;
+                      const offsetY = Math.sin(angle) * radius;
 
                       // Определяем размер кнопки и иконки в зависимости от ширины экрана
                       const buttonSize = getButtonSize(windowWidth);
@@ -457,9 +446,9 @@ export default function VehiclesSection() {
                           key={vehicle.id}
                           className={`vehicle-circle-item absolute z-10 ${activeVehicle === vehicle.id ? 'active' : ''}`}
                           style={{
-                            left: `${positionX}px`,
-                            top: `${positionY}px`,
-                            transform: `translate(-50%, -50%)`
+                            left: centerX,
+                            top: centerY,
+                            transform: `translate(calc(-50% + ${offsetX}px), calc(-50% + ${offsetY}px))`
                           }}
                           initial={{ scale: 0, opacity: 0 }}
                           animate={{

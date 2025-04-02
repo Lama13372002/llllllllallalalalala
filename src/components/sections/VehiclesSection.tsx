@@ -264,6 +264,36 @@ export default function VehiclesSection() {
     }
   }, [vehicles])
 
+  // Функция для обработки изменения активной вкладки
+  const handleTabChange = (value: string) => {
+    // Устанавливаем активное значение
+    setActiveVehicle(value);
+
+    // Добавляем тактильную отдачу при выборе, если поддерживается
+    if ('vibrate' in navigator) {
+      navigator.vibrate(50);
+    }
+
+    // Плавная прокрутка к выбранной вкладке с задержкой, чтобы DOM успел обновиться
+    setTimeout(() => {
+      if (tabsListRef.current) {
+        const tabElement = tabsListRef.current.querySelector(`[value="${value}"]`);
+        if (tabElement) {
+          const tabPosition = tabElement.getBoundingClientRect();
+          const containerPosition = tabsListRef.current.getBoundingClientRect();
+
+          // Центрируем вкладку, если она не находится в центре видимой области
+          if (tabPosition.left < containerPosition.left || tabPosition.right > containerPosition.right) {
+            tabsListRef.current.scrollBy({
+              left: tabPosition.left - containerPosition.left - (containerPosition.width / 2) + (tabPosition.width / 2),
+              behavior: 'smooth'
+            });
+          }
+        }
+      }
+    }, 100);
+  };
+
   // Если данные загружаются, показываем индикатор загрузки
   if (loading) {
     return (
@@ -327,7 +357,7 @@ export default function VehiclesSection() {
 
         <div className="flex flex-col">
           <div className="relative">
-            <Tabs defaultValue={vehicles[0]?.id} onValueChange={setActiveVehicle} className="w-full">
+            <Tabs defaultValue={vehicles[0]?.id} onValueChange={handleTabChange} className="w-full">
               {/* Добавляем переключатель в виде кругового селектора (для средних и больших экранов) */}
               <div className="hidden md:block mb-8">
                 <div className="vehicle-class-selector max-w-4xl mx-auto px-4">
@@ -345,13 +375,20 @@ export default function VehiclesSection() {
                         const isActive = vehicle.id === activeVehicle;
 
                         return (
-                          <TabsTrigger
+                          <button
                             key={vehicle.id}
-                            value={vehicle.id}
                             className={`vehicle-circle-item absolute z-10 ${isActive ? 'active' : ''}`}
                             style={{
                               transform: `translate(${x}px, ${y}px)`,
                               transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)'
+                            }}
+                            onClick={() => {
+                              setActiveVehicle(vehicle.id);
+
+                              // Добавляем тактильную отдачу при выборе, если поддерживается
+                              if ('vibrate' in navigator) {
+                                navigator.vibrate(50);
+                              }
                             }}
                           >
                             <div
@@ -369,7 +406,7 @@ export default function VehiclesSection() {
                                 </span>
                               )}
                             </div>
-                          </TabsTrigger>
+                          </button>
                         );
                       })}
                       <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-28 h-28 rounded-full bg-white dark:bg-gray-800 shadow-md flex items-center justify-center">
@@ -414,29 +451,6 @@ export default function VehiclesSection() {
                             data-[state=active]:shadow-lg data-[state=active]:scale-105
                             data-[state=active]:font-medium vehicles-tab-active vehicle-tab-item
                             relative overflow-hidden"
-                          onClick={() => {
-                            // Добавляем тактильную отдачу при выборе, если поддерживается
-                            if ('vibrate' in navigator) {
-                              navigator.vibrate(50);
-                            }
-
-                            // Плавная прокрутка к выбранной вкладке, чтобы она была видна
-                            if (tabsListRef.current) {
-                              const tabElement = tabsListRef.current.querySelector(`[value="${vehicle.id}"]`);
-                              if (tabElement) {
-                                const tabPosition = tabElement.getBoundingClientRect();
-                                const containerPosition = tabsListRef.current.getBoundingClientRect();
-
-                                // Центрируем вкладку, если она не находится в центре видимой области
-                                if (tabPosition.left < containerPosition.left || tabPosition.right > containerPosition.right) {
-                                  tabsListRef.current.scrollBy({
-                                    left: tabPosition.left - containerPosition.left - (containerPosition.width / 2) + (tabPosition.width / 2),
-                                    behavior: 'smooth'
-                                  });
-                                }
-                              }
-                            }
-                          }}
                         >
                           <Car className="w-3 h-3 sm:w-4 sm:h-4 flex-shrink-0 vehicle-tab-icon" />
                           <span className="whitespace-nowrap font-medium vehicle-tab-text">{vehicle.name}</span>
@@ -498,11 +512,8 @@ export default function VehiclesSection() {
                                   : 'hover:bg-gray-50 dark:hover:bg-gray-700'
                                 }`}
                               onClick={() => {
-                                // Эмулируем клик по соответствующей вкладке
-                                const tabElement = document.querySelector(`[value="${vehicle.id}"]`) as HTMLElement;
-                                if (tabElement) {
-                                  tabElement.click();
-                                }
+                                // Устанавливаем значение активного автомобиля напрямую
+                                setActiveVehicle(vehicle.id);
                                 setShowMobileSelector(false);
 
                                 // Добавляем тактильную отдачу при выборе, если поддерживается

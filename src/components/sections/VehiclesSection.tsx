@@ -130,8 +130,21 @@ export default function VehiclesSection() {
   const [showLeftScroll, setShowLeftScroll] = useState(false)
   const [showRightScroll, setShowRightScroll] = useState(true)
   const [showMobileSelector, setShowMobileSelector] = useState(false)
+  const [windowWidth, setWindowWidth] = useState(typeof window !== 'undefined' ? window.innerWidth : 1024); // Новая переменная состояния для ширины окна
 
   const tabsListRef = useRef<HTMLDivElement>(null)
+
+  // Обновление ширины окна при изменении размера экрана
+  useEffect(() => {
+    const handleResize = () => {
+      setWindowWidth(window.innerWidth);
+    };
+
+    window.addEventListener('resize', handleResize);
+    return () => {
+      window.removeEventListener('resize', handleResize);
+    };
+  }, []);
 
   // Функция для определения видимости стрелок прокрутки
   const checkScrollIndicators = () => {
@@ -165,6 +178,43 @@ export default function VehiclesSection() {
       tabsListRef.current.scrollBy({ left: 100, behavior: 'smooth' })
     }
   }
+
+  // Функция для получения радиуса в зависимости от ширины экрана и количества элементов
+  const getResponsiveRadius = (totalItems: number, width: number) => {
+    if (width <= 320) {
+      return Math.min(100, 80 + (totalItems * 3));
+    } else if (width <= 375) {
+      return Math.min(120, 100 + (totalItems * 3));
+    } else if (width <= 414) {
+      return Math.min(140, 120 + (totalItems * 4));
+    } else if (width <= 640) {
+      return Math.min(150, 130 + (totalItems * 4));
+    } else {
+      return Math.min(160, 130 + (totalItems * 5));
+    }
+  };
+
+  // Функция для получения размера кнопки в зависимости от ширины экрана
+  const getButtonSize = (width: number) => {
+    if (width <= 320) {
+      return 'w-16 h-16';
+    } else if (width <= 375) {
+      return 'w-18 h-18';
+    } else if (width <= 414) {
+      return 'w-20 h-20';
+    } else {
+      return 'w-24 h-24';
+    }
+  };
+
+  // Функция для получения размера иконки в зависимости от ширины экрана
+  const getIconSize = (width: number) => {
+    if (width <= 375) {
+      return 'w-4 h-4';
+    } else {
+      return 'w-6 h-6';
+    }
+  };
 
   // Функция для конвертации данных из БД в формат для отображения
   const formatVehicleData = (dbVehicle: DBVehicle): DisplayVehicle => {
@@ -373,13 +423,16 @@ export default function VehiclesSection() {
                       const angleStep = (2 * Math.PI) / totalItems;
                       const angle = index * angleStep - Math.PI / 2; // Начинаем с верхней позиции
 
-                      // Определяем радиус в зависимости от количества элементов
-                      // Для маленького количества элементов радиус может быть меньше
-                      const baseRadius = Math.min(160, 130 + (totalItems * 5));
+                      // Определяем радиус в зависимости от количества элементов и ширины экрана
+                      const baseRadius = getResponsiveRadius(totalItems, windowWidth);
 
                       // Вычисляем координаты X и Y для позиционирования
                       const x = Math.cos(angle) * baseRadius;
                       const y = Math.sin(angle) * baseRadius;
+
+                      // Определяем размер кнопки и иконки в зависимости от ширины экрана
+                      const buttonSize = getButtonSize(windowWidth);
+                      const iconSize = getIconSize(windowWidth);
 
                       return (
                         <motion.button
@@ -400,9 +453,9 @@ export default function VehiclesSection() {
                           whileTap={{ scale: 0.95 }}
                           onClick={() => handleVehicleSelect(vehicle.id)}
                         >
-                          <div className="flex flex-col items-center justify-center w-24 h-24 rounded-full shadow-md bg-white dark:bg-gray-700 text-gray-800 dark:text-gray-200 hover:shadow-lg transition-all duration-300">
-                            <Car className="w-6 h-6 mb-1 text-primary" />
-                            <span className="text-sm font-medium whitespace-nowrap">{vehicle.name}</span>
+                          <div className={`flex flex-col items-center justify-center rounded-full shadow-md bg-white dark:bg-gray-700 text-gray-800 dark:text-gray-200 hover:shadow-lg transition-all duration-300 ${buttonSize}`}>
+                            <Car className={`${iconSize} mb-1 text-primary`} />
+                            <span className={`${windowWidth <= 375 ? 'text-xs' : 'text-sm'} font-medium whitespace-nowrap`}>{vehicle.name}</span>
                             {vehicle.name === 'VIP' && (
                               <span className="absolute -top-2 -right-2 bg-red-500 text-white text-[10px] px-1.5 py-0.5 rounded-full animate-pulse">
                                 New
@@ -415,19 +468,25 @@ export default function VehiclesSection() {
 
                     {/* Центральный круг */}
                     <motion.div
-                      className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-28 h-28 rounded-full bg-white dark:bg-gray-800 shadow-md flex items-center justify-center"
+                      className={`absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 ${windowWidth <= 375 ? 'w-20 h-20' : 'w-28 h-28'} rounded-full bg-white dark:bg-gray-800 shadow-md flex items-center justify-center`}
                       initial={{ scale: 0 }}
                       animate={{ scale: 1 }}
                       transition={{ delay: 0.3, type: "spring" }}
                     >
                       <div className="text-center">
-                        <Car className="w-8 h-8 text-primary mx-auto mb-1" />
-                        <span className="text-sm font-medium text-gray-700 dark:text-gray-300">Выберите<br/>класс</span>
+                        <Car className={`${windowWidth <= 375 ? 'w-6 h-6' : 'w-8 h-8'} text-primary mx-auto mb-1`} />
+                        <span className={`${windowWidth <= 375 ? 'text-xs' : 'text-sm'} font-medium text-gray-700 dark:text-gray-300`}>Выберите<br/>класс</span>
                       </div>
                     </motion.div>
 
                     {/* Добавим декоративный круг для визуальной подсказки */}
-                    <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-[320px] h-[320px] rounded-full border border-dashed border-gray-200 dark:border-gray-700 opacity-30"></div>
+                    <div
+                      className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 rounded-full border border-dashed border-gray-200 dark:border-gray-700 opacity-30"
+                      style={{
+                        width: `${getResponsiveRadius(vehicles.length, windowWidth) * 2}px`,
+                        height: `${getResponsiveRadius(vehicles.length, windowWidth) * 2}px`
+                      }}
+                    ></div>
                   </motion.div>
                 </div>
               </div>

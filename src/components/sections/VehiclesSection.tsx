@@ -143,16 +143,12 @@ const classGradients: Record<string, string> = {
 
 export default function VehiclesSection() {
   const [vehicles, setVehicles] = useState<DisplayVehicle[]>([])
-  const [activeVehicle, setActiveVehicle] = useState<string>('')
+  const [activeVehicleIndex, setActiveVehicleIndex] = useState(0) // используем индекс вместо ID
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
-  const [showVehicleDetails, setShowVehicleDetails] = useState(false) // Состояние для переключения между каруселью и деталями
-  const [showLeftScroll, setShowLeftScroll] = useState(false)
-  const [showRightScroll, setShowRightScroll] = useState(true)
-  const [showMobileSelector, setShowMobileSelector] = useState(false)
+  const [showVehicleDetails, setShowVehicleDetails] = useState(true) // По умолчанию показываем детали
+  const [direction, setDirection] = useState<'left' | 'right' | null>(null)
   const [windowWidth, setWindowWidth] = useState(typeof window !== 'undefined' ? window.innerWidth : 1024)
-
-  const tabsListRef = useRef<HTMLDivElement>(null)
 
   // Обновление ширины окна при изменении размера экрана
   useEffect(() => {
@@ -165,39 +161,6 @@ export default function VehiclesSection() {
       window.removeEventListener('resize', handleResize);
     };
   }, []);
-
-  // Функция для определения видимости стрелок прокрутки
-  const checkScrollIndicators = () => {
-    if (tabsListRef.current) {
-      const { scrollLeft, scrollWidth, clientWidth } = tabsListRef.current
-      setShowLeftScroll(scrollLeft > 0)
-      setShowRightScroll(scrollLeft < scrollWidth - clientWidth - 5)
-
-      // Найдем родительский контейнер и добавим/удалим класс для левого градиента
-      const tabsContainer = tabsListRef.current.closest('.vehicles-tabs-container')
-      if (tabsContainer) {
-        if (scrollLeft > 0) {
-          tabsContainer.classList.add('can-scroll-left')
-        } else {
-          tabsContainer.classList.remove('can-scroll-left')
-        }
-      }
-    }
-  }
-
-  // Функция для прокрутки списка влево
-  const scrollLeft = () => {
-    if (tabsListRef.current) {
-      tabsListRef.current.scrollBy({ left: -100, behavior: 'smooth' })
-    }
-  }
-
-  // Функция для прокрутки списка вправо
-  const scrollRight = () => {
-    if (tabsListRef.current) {
-      tabsListRef.current.scrollBy({ left: 100, behavior: 'smooth' })
-    }
-  }
 
   // Функция для конвертации данных из БД в формат для отображения
   const formatVehicleData = (dbVehicle: DBVehicle): DisplayVehicle => {
@@ -252,7 +215,7 @@ export default function VehiclesSection() {
 
         if (activeVehicles.length > 0) {
           setVehicles(activeVehicles)
-          setActiveVehicle(activeVehicles[0].id)
+          setActiveVehicleIndex(0)
         } else {
           // Если нет активных транспортных средств в БД, используем демо-данные
           const demoVehicles: DBVehicle[] = [
@@ -320,7 +283,7 @@ export default function VehiclesSection() {
 
           const formattedDemoVehicles = demoVehicles.map(formatVehicleData);
           setVehicles(formattedDemoVehicles);
-          setActiveVehicle(formattedDemoVehicles[0].id);
+          setActiveVehicleIndex(0);
         }
       } else {
         // Если нет данных, отображаем сообщение
@@ -342,45 +305,51 @@ export default function VehiclesSection() {
     fetchVehicles()
   }, [])
 
-  // Для отладки - выводим в консоль данные о загруженных транспортных средствах
-  useEffect(() => {
-    if (vehicles.length > 0) {
-      console.log('Loaded vehicles:', vehicles)
-    }
-  }, [vehicles])
+  // Функция для перехода к следующему автомобилю
+  const handleNextVehicle = () => {
+    setDirection('right');
+    setTimeout(() => {
+      setActiveVehicleIndex((prevIndex) => (prevIndex + 1) % vehicles.length);
+      setDirection(null);
 
-  // Добавляем эффект для отслеживания прокрутки
-  useEffect(() => {
-    const tabsListElement = tabsListRef.current
-    if (tabsListElement) {
-      checkScrollIndicators()
-      tabsListElement.addEventListener('scroll', checkScrollIndicators)
-      window.addEventListener('resize', checkScrollIndicators)
-
-      return () => {
-        tabsListElement.removeEventListener('scroll', checkScrollIndicators)
-        window.removeEventListener('resize', checkScrollIndicators)
+      // Добавляем тактильную отдачу при переключении, если поддерживается
+      if ('vibrate' in navigator) {
+        navigator.vibrate(40);
       }
-    }
-  }, [vehicles])
-
-  // Функция для обработки выбора автомобиля
-  const handleVehicleSelect = (vehicleId: string) => {
-    // Устанавливаем активное значение
-    setActiveVehicle(vehicleId);
-
-    // Показываем детали автомобиля
-    setShowVehicleDetails(true);
-
-    // Добавляем тактильную отдачу при выборе, если поддерживается
-    if ('vibrate' in navigator) {
-      navigator.vibrate(50);
-    }
+    }, 300);
   };
 
-  // Функция для возврата к карусели
-  const handleBackToCarousel = () => {
-    setShowVehicleDetails(false);
+  // Функция для перехода к предыдущему автомобилю
+  const handlePrevVehicle = () => {
+    setDirection('left');
+    setTimeout(() => {
+      setActiveVehicleIndex((prevIndex) => (prevIndex - 1 + vehicles.length) % vehicles.length);
+      setDirection(null);
+
+      // Добавляем тактильную отдачу при переключении, если поддерживается
+      if ('vibrate' in navigator) {
+        navigator.vibrate(40);
+      }
+    }, 300);
+  };
+
+  // Функция для выбора автомобиля по индексу
+  const handleVehicleSelect = (index: number) => {
+    if (index > activeVehicleIndex) {
+      setDirection('right');
+    } else if (index < activeVehicleIndex) {
+      setDirection('left');
+    }
+
+    setTimeout(() => {
+      setActiveVehicleIndex(index);
+      setDirection(null);
+
+      // Добавляем тактильную отдачу при выборе, если поддерживается
+      if ('vibrate' in navigator) {
+        navigator.vibrate(50);
+      }
+    }, 300);
   };
 
   // Если данные загружаются, показываем индикатор загрузки
@@ -420,7 +389,8 @@ export default function VehiclesSection() {
   }
 
   // Получаем данные активного автомобиля
-  const currentVehicle = vehicles.find(v => v.id === activeVehicle)
+  const currentVehicle = vehicles[activeVehicleIndex];
+  const gradient = classGradients[currentVehicle.name] || classGradients.default;
 
   return (
     <section id="vehicles" className="py-16 md:py-20 bg-white dark:bg-gray-800">
@@ -447,80 +417,36 @@ export default function VehiclesSection() {
           </motion.p>
         </div>
 
-        <AnimatePresence mode="wait">
-          {!showVehicleDetails ? (
-            <motion.div
-              key="carousel"
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              exit={{ opacity: 0 }}
-              transition={{ duration: 0.4 }}
-              className="flex flex-col"
-            >
-              {/* New vehicle class selector - card based layout */}
-              <div className="vehicle-class-selector max-w-5xl mx-auto px-4 mb-8">
-                <motion.div
-                  className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4 md:gap-6 justify-center"
-                  initial={{ opacity: 0 }}
-                  animate={{ opacity: 1 }}
-                  transition={{ duration: 0.5 }}
-                >
-                  {vehicles.map((vehicle, index) => {
-                    // Get gradient and icon for this vehicle class
-                    const gradient = classGradients[vehicle.name] || classGradients.default;
-                    const icon = classIcons[vehicle.name] || classIcons.default;
-
-                    return (
-                      <motion.div
-                        key={vehicle.id}
-                        className={`vehicle-class-card cursor-pointer mx-auto ${activeVehicle === vehicle.id ? 'ring-2 ring-primary ring-offset-2' : ''}`}
-                        initial={{ opacity: 0, y: 20 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        transition={{ delay: index * 0.1, duration: 0.4 }}
-                        onClick={() => handleVehicleSelect(vehicle.id)}
-                        whileHover={{ scale: 1.03 }}
-                        whileTap={{ scale: 0.98 }}
-                      >
-                        <div className={`card-gradient bg-gradient-to-r ${gradient}`}>
-                          <div className="card-icon text-white">
-                            {icon}
-                          </div>
-                          {vehicle.name === 'VIP' && (
-                            <span className="premium-badge animate-pulse">
-                              Premium
-                            </span>
-                          )}
-                        </div>
-                        <div className="card-content">
-                          <h3 className="vehicle-name text-gray-800 dark:text-gray-200">
-                            {vehicle.name}
-                          </h3>
-                          <p className="vehicle-price">
-                            {vehicle.price}
-                          </p>
-                        </div>
-                      </motion.div>
-                    );
-                  })}
-                </motion.div>
-              </div>
-            </motion.div>
-          ) : (
-            <motion.div
-              key="details"
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: -20 }}
-              transition={{ duration: 0.5 }}
-              className="mt-8"
-            >
-              {currentVehicle && (
+        <div className="max-w-6xl mx-auto">
+          {/* Карусель с автомобилями */}
+          <div className="relative">
+            {/* Карточка автомобиля */}
+            <AnimatePresence mode="wait">
+              <motion.div
+                key={currentVehicle.id}
+                initial={{
+                  opacity: 0,
+                  x: direction === 'left' ? -200 : direction === 'right' ? 200 : 0
+                }}
+                animate={{ opacity: 1, x: 0 }}
+                exit={{
+                  opacity: 0,
+                  x: direction === 'left' ? 200 : direction === 'right' ? -200 : 0
+                }}
+                transition={{
+                  type: "spring",
+                  stiffness: 300,
+                  damping: 30,
+                  duration: 0.4
+                }}
+                className="vehicle-carousel-card"
+              >
                 <div className="grid md:grid-cols-2 gap-8 md:gap-10 items-center">
                   <motion.div
-                    className="relative rounded-lg overflow-hidden shadow-xl group"
-                    initial={{ opacity: 0, x: -50 }}
-                    animate={{ opacity: 1, x: 0 }}
-                    transition={{ duration: 0.6 }}
+                    className="relative rounded-xl overflow-hidden shadow-xl group"
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                    transition={{ duration: 0.6, delay: 0.2 }}
                   >
                     <div
                       className="aspect-[16/9] bg-cover bg-center relative transition-all duration-700 transform group-hover:scale-105"
@@ -529,16 +455,34 @@ export default function VehiclesSection() {
                         animationDuration: '3s'
                       }}
                     >
+                      <div className={`absolute inset-0 opacity-30 bg-gradient-to-t ${gradient}`}></div>
                     </div>
                     <div className="absolute top-4 right-4 bg-primary/90 text-white px-3 py-1 rounded-full text-sm font-medium backdrop-blur-sm shadow-lg transform hover:scale-105 transition-transform">
                       {currentVehicle.price}
                     </div>
+
+                    {/* Стрелки навигации */}
+                    <button
+                      onClick={handlePrevVehicle}
+                      className="absolute left-3 top-1/2 -translate-y-1/2 bg-white/80 dark:bg-gray-800/80 hover:bg-white dark:hover:bg-gray-800 w-10 h-10 rounded-full flex items-center justify-center shadow-lg transition-all duration-300 hover:scale-110 active:scale-95 backdrop-blur-sm"
+                      aria-label="Предыдущий автомобиль"
+                    >
+                      <ChevronLeft className="w-5 h-5 text-gray-700 dark:text-gray-200" />
+                    </button>
+
+                    <button
+                      onClick={handleNextVehicle}
+                      className="absolute right-3 top-1/2 -translate-y-1/2 bg-white/80 dark:bg-gray-800/80 hover:bg-white dark:hover:bg-gray-800 w-10 h-10 rounded-full flex items-center justify-center shadow-lg transition-all duration-300 hover:scale-110 active:scale-95 backdrop-blur-sm"
+                      aria-label="Следующий автомобиль"
+                    >
+                      <ChevronRight className="w-5 h-5 text-gray-700 dark:text-gray-200" />
+                    </button>
                   </motion.div>
 
                   <motion.div
-                    initial={{ opacity: 0, x: 50 }}
-                    animate={{ opacity: 1, x: 0 }}
-                    transition={{ duration: 0.6, delay: 0.2 }}
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ duration: 0.6, delay: 0.3 }}
                   >
                     <div className="mb-6">
                       <h3 className="text-xl sm:text-2xl md:text-3xl font-bold mb-2 text-gray-900 dark:text-white flex flex-wrap items-center gap-1">
@@ -593,15 +537,7 @@ export default function VehiclesSection() {
                         ))}
                       </motion.div>
 
-                      <div className="flex flex-col sm:flex-row gap-4">
-                        <Button
-                          className="w-full sm:w-auto btn-secondary relative group overflow-hidden rounded-full font-medium transition-all px-4 sm:px-6 py-3 sm:py-4 flex items-center justify-center gap-2"
-                          onClick={handleBackToCarousel}
-                        >
-                          <Undo2 className="w-4 h-4 sm:w-5 sm:h-5" />
-                          <span>Выбрать другой класс</span>
-                        </Button>
-
+                      <div className="mt-8">
                         <Dialog>
                           <DialogTrigger asChild>
                             <Button className="w-full sm:w-auto btn-gradient relative group overflow-hidden rounded-full font-medium transition-all px-4 sm:px-6 py-3 sm:py-4 vehicle-order-button">
@@ -620,10 +556,42 @@ export default function VehiclesSection() {
                     </div>
                   </motion.div>
                 </div>
-              )}
-            </motion.div>
-          )}
-        </AnimatePresence>
+              </motion.div>
+            </AnimatePresence>
+
+            {/* Индикаторы выбора класса транспорта */}
+            <div className="flex flex-wrap justify-center items-center gap-2 sm:gap-3 mt-8">
+              {vehicles.map((vehicle, index) => {
+                const isActive = index === activeVehicleIndex;
+                const vehicleGradient = classGradients[vehicle.name] || classGradients.default;
+
+                return (
+                  <button
+                    key={vehicle.id}
+                    onClick={() => handleVehicleSelect(index)}
+                    className={`vehicle-selector-button relative px-3 py-2 sm:px-4 sm:py-2 rounded-lg transition-all duration-300 text-sm sm:text-base
+                      ${isActive
+                        ? `bg-gradient-to-r ${vehicleGradient} text-white shadow-md`
+                        : 'bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600'
+                      }`}
+                    aria-label={`Выбрать ${vehicle.name}`}
+                  >
+                    <span className="relative z-10 font-medium">{vehicle.name}</span>
+                    {isActive && (
+                      <motion.span
+                        layoutId="activeIndicator"
+                        className="absolute inset-0 rounded-lg"
+                        initial={{ opacity: 0 }}
+                        animate={{ opacity: 1 }}
+                        transition={{ duration: 0.3 }}
+                      />
+                    )}
+                  </button>
+                );
+              })}
+            </div>
+          </div>
+        </div>
       </div>
     </section>
   )

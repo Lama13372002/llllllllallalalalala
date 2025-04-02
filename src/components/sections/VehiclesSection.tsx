@@ -419,18 +419,34 @@ export default function VehiclesSection() {
                     transition={{ duration: 0.5, type: "spring" }}
                   >
                     {vehicles.map((vehicle, index) => {
-                      // Вычисляем положение для каждой кнопки на круге
-                      const totalItems = vehicles.length;
-                      const angleStep = (2 * Math.PI) / totalItems;
-                      const angle = index * angleStep - Math.PI / 2; // Начинаем с верхней позиции
+                      // Используем фиксированные координаты для позиционирования
+                      // на основе предоставленных данных
+                      let positionX, positionY;
 
-                      // Определяем радиус в зависимости от количества элементов и ширины экрана
-                      const baseRadius = getResponsiveRadius(totalItems, windowWidth);
+                      // Фиксированные координаты для каждой кнопки
+                      const fixedPositions = [
+                        { x: 54, y: 704 },   // первая кнопка
+                        { x: 290, y: 483 },  // вторая кнопка
+                        { x: 539, y: 710 },  // третья кнопка
+                        { x: 444, y: 914 },  // четвертая кнопка
+                        { x: 152, y: 919 }   // пятая кнопка
+                      ];
 
-                      // Вычисляем координаты X и Y для позиционирования
-                      const radius = getResponsiveRadius(totalItems, windowWidth);
-                      const x = Math.cos(angle) * radius;
-                      const y = Math.sin(angle) * radius;
+                      // Получаем координаты для текущей кнопки
+                      if (index < fixedPositions.length) {
+                        positionX = fixedPositions[index].x;
+                        positionY = fixedPositions[index].y;
+                      } else {
+                        // Если кнопок больше чем координат, используем последнюю координату
+                        positionX = fixedPositions[fixedPositions.length - 1].x;
+                        positionY = fixedPositions[fixedPositions.length - 1].y;
+                      }
+
+                      // Масштабирование координат в зависимости от размера экрана
+                      // Координаты даны относительно размера экрана ~600px (предполагаемый оригинальный размер)
+                      const scaleFactor = windowWidth / 600;
+                      positionX = positionX * scaleFactor;
+                      positionY = positionY * scaleFactor;
 
                       // Определяем размер кнопки и иконки в зависимости от ширины экрана
                       const buttonSize = getButtonSize(windowWidth);
@@ -441,9 +457,9 @@ export default function VehiclesSection() {
                           key={vehicle.id}
                           className={`vehicle-circle-item absolute z-10 ${activeVehicle === vehicle.id ? 'active' : ''}`}
                           style={{
-                            left: '50%',
-                            top: '50%',
-                            transform: `translate(-50%, -50%) translate(${x}px, ${y}px)`
+                            left: `${positionX}px`,
+                            top: `${positionY}px`,
+                            transform: `translate(-50%, -50%)`
                           }}
                           initial={{ scale: 0, opacity: 0 }}
                           animate={{
@@ -468,7 +484,7 @@ export default function VehiclesSection() {
                       );
                     })}
 
-                    {/* Центральный круг */}
+                    {/* Центральный круг - оставляем его по центру */}
                     <motion.div
                       className={`absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 ${windowWidth <= 375 ? 'w-20 h-20' : 'w-28 h-28'} rounded-full bg-white dark:bg-gray-800 shadow-md flex items-center justify-center`}
                       initial={{ scale: 0 }}
@@ -480,15 +496,6 @@ export default function VehiclesSection() {
                         <span className={`${windowWidth <= 375 ? 'text-xs' : 'text-sm'} font-medium text-gray-700 dark:text-gray-300`}>Выберите<br/>класс</span>
                       </div>
                     </motion.div>
-
-                    {/* Добавим декоративный круг для визуальной подсказки */}
-                    <div
-                      className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 rounded-full border border-dashed border-gray-200 dark:border-gray-700 opacity-30"
-                      style={{
-                        width: `${getResponsiveRadius(vehicles.length, windowWidth) * 2}px`,
-                        height: `${getResponsiveRadius(vehicles.length, windowWidth) * 2}px`
-                      }}
-                    ></div>
                   </motion.div>
                 </div>
               </div>

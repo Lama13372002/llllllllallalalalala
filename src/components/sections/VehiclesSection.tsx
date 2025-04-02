@@ -183,15 +183,15 @@ export default function VehiclesSection() {
   const getResponsiveRadius = (totalItems: number, width: number) => {
     // Адаптивный радиус для разных размеров экрана
     if (width <= 320) {
-      return 100; // Маленькие мобильные экраны
+      return 120; // Маленькие мобильные экраны
     } else if (width <= 375) {
-      return 120; // Средние мобильные экраны
+      return 140; // Средние мобильные экраны
     } else if (width <= 414) {
-      return 140; // Большие мобильные экраны
+      return 160; // Большие мобильные экраны
     } else if (width <= 640) {
-      return 160; // Планшеты и маленькие десктопы
+      return 190; // Планшеты и маленькие десктопы
     } else {
-      return 180; // Большие экраны
+      return 220; // Большие экраны
     }
   };
 
@@ -410,20 +410,32 @@ export default function VehiclesSection() {
               className="flex flex-col"
             >
               {/* Карусель (только круговой селектор) */}
-              <div className="vehicle-class-selector max-w-4xl mx-auto px-4 mb-8">
+              <div className="vehicle-class-selector max-w-4xl mx-auto px-4 mb-8 mt-16">
                 <div className="flex justify-center">
                   <motion.div
                     className="vehicle-circle-selector relative"
                     initial={{ scale: 0.9 }}
                     animate={{ scale: 1 }}
                     transition={{ duration: 0.5, type: "spring" }}
-                    style={{ width: '100%', height: windowWidth <= 640 ? 350 : 400, position: 'relative' }}
+                    style={{
+                      width: '100%',
+                      height: windowWidth <= 640 ? 300 : 350,
+                      position: 'relative',
+                      marginTop: '30px' // Добавляем отступ сверху
+                    }}
                   >
                     {vehicles.map((vehicle, index) => {
-                      // Используем тригонометрию для расчета позиции в круге
+                      // Вместо полного круга делаем полукруг (от 0 до Math.PI)
                       const totalVehicles = vehicles.length;
-                      // Начинаем с верхней точки круга и равномерно распределяем кнопки
-                      const angle = (Math.PI * 2 / totalVehicles) * index - Math.PI / 2;
+
+                      // Распределяем кнопки по полукругу (от 0 до Math.PI)
+                      // StartAngle - это угол начала полукруга, endAngle - угол конца полукруга
+                      const startAngle = Math.PI; // Нижняя точка (начало от буквы "Н")
+                      const endAngle = 0; // Верхняя точка (конец на букве "к")
+
+                      // Вычисляем угол для текущей кнопки на основе ее индекса
+                      // Равномерно распределяем от startAngle до endAngle
+                      const angle = startAngle + (endAngle - startAngle) * (index / (totalVehicles - 1));
 
                       // Получаем радиус круга
                       const radius = getResponsiveRadius(totalVehicles, windowWidth);
@@ -431,7 +443,7 @@ export default function VehiclesSection() {
                       // Вычисляем координаты на основе угла и радиуса
                       // Центрируем круг по центру контейнера
                       const centerX = '50%';
-                      const centerY = '50%';
+                      const centerY = '100%'; // Центр находится в нижней части контейнера
 
                       // Вычисляем смещение относительно центра
                       const offsetX = Math.cos(angle) * radius;
@@ -448,7 +460,7 @@ export default function VehiclesSection() {
                           style={{
                             left: centerX,
                             top: centerY,
-                            transform: `translate(calc(-50% + ${offsetX}px), calc(-50% + ${offsetY}px))`
+                            transform: `translate(calc(-50% + ${offsetX}px), calc(-50% - ${Math.abs(offsetY)}px))`
                           }}
                           initial={{ scale: 0, opacity: 0 }}
                           animate={{
@@ -473,9 +485,9 @@ export default function VehiclesSection() {
                       );
                     })}
 
-                    {/* Центральный круг - оставляем его по центру */}
+                    {/* Центральный круг - перемещаем в центральную нижнюю позицию */}
                     <motion.div
-                      className={`absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 ${windowWidth <= 375 ? 'w-20 h-20' : 'w-28 h-28'} rounded-full bg-white dark:bg-gray-800 shadow-md flex items-center justify-center`}
+                      className={`absolute left-1/2 bottom-0 transform -translate-x-1/2 ${windowWidth <= 375 ? 'w-20 h-20' : 'w-28 h-28'} rounded-full bg-white dark:bg-gray-800 shadow-md flex items-center justify-center`}
                       initial={{ scale: 0 }}
                       animate={{ scale: 1 }}
                       transition={{ delay: 0.3, type: "spring" }}

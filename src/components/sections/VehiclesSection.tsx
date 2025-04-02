@@ -369,17 +369,27 @@ export default function VehiclesSection() {
                   >
                     {vehicles.map((vehicle, index) => {
                       // Вычисляем положение для каждой кнопки на круге
-                      const angleStep = (2 * Math.PI) / vehicles.length;
+                      const totalItems = vehicles.length;
+                      const angleStep = (2 * Math.PI) / totalItems;
                       const angle = index * angleStep - Math.PI / 2; // Начинаем с верхней позиции
-                      const radius = 150; // Радиус круга
-                      const x = Math.cos(angle) * radius;
-                      const y = Math.sin(angle) * radius;
+
+                      // Определяем радиус в зависимости от количества элементов
+                      // Для маленького количества элементов радиус может быть меньше
+                      const baseRadius = Math.min(160, 130 + (totalItems * 5));
+
+                      // Вычисляем координаты X и Y для позиционирования
+                      const x = Math.cos(angle) * baseRadius;
+                      const y = Math.sin(angle) * baseRadius;
 
                       return (
                         <motion.button
                           key={vehicle.id}
                           className="vehicle-circle-item absolute z-10"
-                          style={{ transform: `translate(${x}px, ${y}px)` }}
+                          style={{
+                            left: "50%",
+                            top: "50%",
+                            transform: `translate(calc(-50% + ${x}px), calc(-50% + ${y}px))`
+                          }}
                           initial={{ scale: 0, opacity: 0 }}
                           animate={{
                             scale: 1,
@@ -402,6 +412,8 @@ export default function VehiclesSection() {
                         </motion.button>
                       );
                     })}
+
+                    {/* Центральный круг */}
                     <motion.div
                       className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-28 h-28 rounded-full bg-white dark:bg-gray-800 shadow-md flex items-center justify-center"
                       initial={{ scale: 0 }}
@@ -413,6 +425,9 @@ export default function VehiclesSection() {
                         <span className="text-sm font-medium text-gray-700 dark:text-gray-300">Выберите<br/>класс</span>
                       </div>
                     </motion.div>
+
+                    {/* Добавим декоративный круг для визуальной подсказки */}
+                    <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-[320px] h-[320px] rounded-full border border-dashed border-gray-200 dark:border-gray-700 opacity-30"></div>
                   </motion.div>
                 </div>
               </div>

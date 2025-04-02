@@ -427,6 +427,7 @@ export default function VehiclesSection() {
                       const baseRadius = getResponsiveRadius(totalItems, windowWidth);
 
                       // Вычисляем координаты X и Y для позиционирования
+                      // Исправляем смещение кнопок, центрируя круг относительно центра экрана
                       const x = Math.cos(angle) * baseRadius;
                       const y = Math.sin(angle) * baseRadius;
 
@@ -439,9 +440,9 @@ export default function VehiclesSection() {
                           key={vehicle.id}
                           className={`vehicle-circle-item absolute z-10 ${activeVehicle === vehicle.id ? 'active' : ''}`}
                           style={{
-                            left: `calc(50% + ${x}px)`,
-                            top: `calc(50% + ${y}px)`,
-                            transform: `translate(-50%, -50%)`
+                            left: `50%`,
+                            top: `50%`,
+                            transform: `translate(-50%, -50%) translate(${x}px, ${y}px)`
                           }}
                           initial={{ scale: 0, opacity: 0 }}
                           animate={{

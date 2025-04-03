@@ -1220,4 +1220,25 @@ section#reviews button:focus {
   }
 }
 
+/* Стили для iOS устройств */
+@supports (-webkit-touch-callout: none) {
+  .vehicle-selector-button {
+    -webkit-tap-highlight-color: transparent;
+    touch-action: manipulation;
+  }
+
+  .vehicle-carousel-card {
+    -webkit-user-select: none;
+    user-select: none;
+    touch-action: manipulation;
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  button {
+    -webkit-touch-callout: none;
+    -webkit-user-select: none;
+    -webkit-tap-highlight-color: transparent;
+  }
+}
+
 /* Конец файла */

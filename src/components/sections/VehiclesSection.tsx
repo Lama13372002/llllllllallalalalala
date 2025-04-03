@@ -150,6 +150,9 @@ export default function VehiclesSection() {
   const [direction, setDirection] = useState<'left' | 'right' | null>(null)
   const [windowWidth, setWindowWidth] = useState(typeof window !== 'undefined' ? window.innerWidth : 1024)
 
+  // Добавим переменную для отслеживания состояния блокировки навигации
+  const [isNavigationLocked, setIsNavigationLocked] = useState(false);
+
   // Обновление ширины окна при изменении размера экрана
   useEffect(() => {
     const handleResize = () => {
@@ -307,34 +310,62 @@ export default function VehiclesSection() {
 
   // Функция для перехода к следующему автомобилю
   const handleNextVehicle = () => {
+    // Проверка блокировки, чтобы предотвратить множественные вызовы
+    if (isNavigationLocked) return;
+
+    // Блокируем навигацию
+    setIsNavigationLocked(true);
     setDirection('right');
+
     setTimeout(() => {
       setActiveVehicleIndex((prevIndex) => (prevIndex + 1) % vehicles.length);
-      setDirection(null);
 
-      // Добавляем тактильную отдачу при переключении, если поддерживается
-      if ('vibrate' in navigator) {
-        navigator.vibrate(40);
-      }
+      // Разблокируем навигацию после завершения анимации
+      setTimeout(() => {
+        setDirection(null);
+        setIsNavigationLocked(false);
+
+        // Добавляем тактильную отдачу при переключении, если поддерживается
+        if ('vibrate' in navigator) {
+          navigator.vibrate(40);
+        }
+      }, 50);
     }, 300);
   };
 
   // Функция для перехода к предыдущему автомобилю
   const handlePrevVehicle = () => {
+    // Проверка блокировки, чтобы предотвратить множественные вызовы
+    if (isNavigationLocked) return;
+
+    // Блокируем навигацию
+    setIsNavigationLocked(true);
     setDirection('left');
+
     setTimeout(() => {
       setActiveVehicleIndex((prevIndex) => (prevIndex - 1 + vehicles.length) % vehicles.length);
-      setDirection(null);
 
-      // Добавляем тактильную отдачу при переключении, если поддерживается
-      if ('vibrate' in navigator) {
-        navigator.vibrate(40);
-      }
+      // Разблокируем навигацию после завершения анимации
+      setTimeout(() => {
+        setDirection(null);
+        setIsNavigationLocked(false);
+
+        // Добавляем тактильную отдачу при переключении, если поддерживается
+        if ('vibrate' in navigator) {
+          navigator.vibrate(40);
+        }
+      }, 50);
     }, 300);
   };
 
   // Функция для выбора автомобиля по индексу
   const handleVehicleSelect = (index: number) => {
+    // Проверка блокировки, чтобы предотвратить множественные вызовы
+    if (isNavigationLocked || index === activeVehicleIndex) return;
+
+    // Блокируем навигацию
+    setIsNavigationLocked(true);
+
     if (index > activeVehicleIndex) {
       setDirection('right');
     } else if (index < activeVehicleIndex) {
@@ -343,12 +374,17 @@ export default function VehiclesSection() {
 
     setTimeout(() => {
       setActiveVehicleIndex(index);
-      setDirection(null);
 
-      // Добавляем тактильную отдачу при выборе, если поддерживается
-      if ('vibrate' in navigator) {
-        navigator.vibrate(50);
-      }
+      // Разблокируем навигацию после завершения анимации
+      setTimeout(() => {
+        setDirection(null);
+        setIsNavigationLocked(false);
+
+        // Добавляем тактильную отдачу при выборе, если поддерживается
+        if ('vibrate' in navigator) {
+          navigator.vibrate(50);
+        }
+      }, 50);
     }, 300);
   };
 

@@ -20,6 +20,9 @@ export async function GET() {
   }
 }
 
+// Допустимые значения для способа связи
+const VALID_CONTACT_METHODS = ['telegram', 'whatsapp', 'call'];
+
 // POST /api/application-requests - создание новой заявки
 export async function POST(request: Request) {
   console.log('POST request to /api/application-requests received');
@@ -37,7 +40,16 @@ export async function POST(request: Request) {
       );
     }
 
-    // Создание заявки напрямую, без вложенных try/catch
+    // Проверка допустимых значений contactMethod
+    if (!VALID_CONTACT_METHODS.includes(data.contactMethod)) {
+      console.error('Validation error - invalid contact method:', data.contactMethod);
+      return NextResponse.json(
+        { error: 'Неверный способ связи. Допустимые значения: telegram, whatsapp, call' },
+        { status: 400 }
+      );
+    }
+
+    // Создание заявки
     const newRequest = await prisma.applicationRequest.create({
       data: {
         name: data.name,

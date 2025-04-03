@@ -99,17 +99,6 @@ export default function HeroSection() {
                 <ApplicationForm />
               </DialogContent>
             </Dialog>
-
-            <Dialog open={isBookingOpen} onOpenChange={setIsBookingOpen}>
-              <DialogTrigger asChild>
-                <Button size="lg" variant="outline" className="text-white text-lg font-medium hover:bg-white/10">
-                  Заказать трансфер
-                </Button>
-              </DialogTrigger>
-              <DialogContent className="sm:max-w-[625px] p-0 overflow-hidden">
-                <BookingForm />
-              </DialogContent>
-            </Dialog>
           </motion.div>
 
           <motion.div

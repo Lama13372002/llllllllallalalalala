@@ -8,7 +8,7 @@ declare global {
   }
 }
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { z } from 'zod'
@@ -151,6 +151,91 @@ const formSchema = z.object({
   path: ["destinationAddress"]
 });
 
+// Компонент для отображения подтверждающего окна
+type ConfirmationModalProps = {
+  formData: z.infer<typeof formSchema>;
+  vehicleOptions: VehicleOption[];
+  onConfirm: () => void;
+  onCancel: () => void;
+};
+
+function ConfirmationModal({ formData, vehicleOptions, onConfirm, onCancel }: ConfirmationModalProps) {
+  // Найдем выбранный автомобиль
+  const selectedVehicle = vehicleOptions.find(v => v.value === formData.vehicleClass);
+
+  // Определяем города отправления и прибытия
+  const originCity = formData.originCity === 'custom' ? formData.customOriginCity : cities.find(c => c.value === formData.originCity)?.label;
+  const destinationCity = formData.destinationCity === 'custom' ? formData.customDestinationCity : cities.find(c => c.value === formData.destinationCity)?.label;
+
+  // Объект для отображения способа оплаты на русском
+  const paymentMethods = {
+    cash: 'Наличными',
+    card: 'Банковской картой',
+    online: 'Онлайн оплата'
+  };
+
+  return (
+    <div className="relative p-6 max-h-[90vh] overflow-y-auto">
+      <div className="sticky top-0 bg-white dark:bg-gray-950 z-10 p-4 flex items-center justify-between border-b">
+        <h2 className="text-xl font-bold">Подтверждение заказа</h2>
+        <Button
+          variant="ghost"
+          size="icon"
+          className="rounded-full"
+          onClick={onCancel}
+        >
+          <X className="h-4 w-4" />
+          <span className="sr-only">Закрыть</span>
+        </Button>
+      </div>
+
+      <div className="py-4">
+        <div className="bg-blue-50 dark:bg-blue-900/20 p-4 rounded-lg mb-6">
+          <h3 className="text-lg font-medium text-blue-800 dark:text-blue-200 mb-3">Информация о заказе</h3>
+          <div className="space-y-2">
+            <p className="flex justify-between"><span className="font-medium">Имя:</span> <span>{formData.name}</span></p>
+            <p className="flex justify-between"><span className="font-medium">Телефон:</span> <span>{formData.phone}</span></p>
+            <p className="flex justify-between"><span className="font-medium">Класс автомобиля:</span> <span>{selectedVehicle?.label} ({selectedVehicle?.price})</span></p>
+            <p className="flex justify-between"><span className="font-medium">Дата и время:</span> <span>{format(formData.date as Date, 'dd.MM.yyyy')} в {formData.time}</span></p>
+            <p className="flex justify-between"><span className="font-medium">Откуда:</span> <span>{originCity}, {formData.originAddress}</span></p>
+            <p className="flex justify-between"><span className="font-medium">Куда:</span> <span>{destinationCity}, {formData.tellDriver ? 'Уточнит водителю' : formData.destinationAddress}</span></p>
+            <p className="flex justify-between"><span className="font-medium">Способ оплаты:</span> <span>{paymentMethods[formData.paymentMethod as keyof typeof paymentMethods]}</span></p>
+
+            {formData.returnTransfer === 'yes' && (
+              <>
+                <div className="border-t border-blue-200 dark:border-blue-700 my-2 pt-2">
+                  <h4 className="font-medium text-blue-800 dark:text-blue-200 mb-2">Обратный трансфер</h4>
+                  <p className="flex justify-between"><span className="font-medium">Дата и время:</span> <span>{format(formData.returnDate as Date, 'dd.MM.yyyy')} в {formData.returnTime}</span></p>
+                </div>
+              </>
+            )}
+
+            {formData.comments && (
+              <div className="border-t border-blue-200 dark:border-blue-700 my-2 pt-2">
+                <h4 className="font-medium text-blue-800 dark:text-blue-200 mb-2">Комментарий</h4>
+                <p className="text-sm">{formData.comments}</p>
+              </div>
+            )}
+          </div>
+        </div>
+
+        <div className="flex flex-col-reverse sm:flex-row gap-3 justify-end mt-6">
+          <Button variant="outline" onClick={onCancel}>
+            Отмена
+          </Button>
+          <Button
+            type="button"
+            className="btn-gradient"
+            onClick={onConfirm}
+          >
+            Подтвердить заказ
+          </Button>
+        </div>
+      </div>
+    </div>
+  );
+}
+
 export default function BookingForm() {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [showMap, setShowMap] = useState(false);
@@ -159,6 +244,8 @@ export default function BookingForm() {
   const [loadingConfig, setLoadingConfig] = useState(true);
   const [isSuccess, setIsSuccess] = useState(false);
   const [error, setError] = useState('');
+  const [showConfirmation, setShowConfirmation] = useState(false);
+  const [formValues, setFormValues] = useState<z.infer<typeof formSchema> | null>(null);
 
   // Измененная форма с динамическим vehicleClass
   const form = useForm<z.infer<typeof formSchema>>({
@@ -266,33 +353,42 @@ export default function BookingForm() {
 
   // Функция отправки формы
   const onSubmit = async (data: z.infer<typeof formSchema>) => {
+    // Сохраняем введенные данные формы и показываем окно подтверждения
+    setFormValues(data);
+    setShowConfirmation(true);
+  };
+
+  // Функция подтверждения и отправки заказа
+  const confirmOrder = async () => {
+    if (!formValues) return;
+
     setIsSubmitting(true);
     setIsSuccess(false);
     setError('');
 
     try {
       // Определяем города отправления и прибытия
-      const originCity = data.originCity === 'custom' ? data.customOriginCity : cities.find(c => c.value === data.originCity)?.label;
-      const destinationCity = data.destinationCity === 'custom' ? data.customDestinationCity : cities.find(c => c.value === data.destinationCity)?.label;
+      const originCity = formValues.originCity === 'custom' ? formValues.customOriginCity : cities.find(c => c.value === formValues.originCity)?.label;
+      const destinationCity = formValues.destinationCity === 'custom' ? formValues.customDestinationCity : cities.find(c => c.value === formValues.destinationCity)?.label;
 
       // Создаем данные запроса
       const requestData = {
-        customerName: data.name,
-        customerPhone: data.phone,
-        vehicleClass: data.vehicleClass,
-        date: data.date,
-        time: data.time,
+        customerName: formValues.name,
+        customerPhone: formValues.phone,
+        vehicleClass: formValues.vehicleClass,
+        date: formValues.date,
+        time: formValues.time,
         originCity: originCity,
-        originAddress: data.originAddress,
+        originAddress: formValues.originAddress,
         destinationCity: destinationCity,
-        destinationAddress: data.tellDriver ? '' : data.destinationAddress,
-        tellDriver: data.tellDriver,
-        paymentMethod: data.paymentMethod,
-        returnTransfer: data.returnTransfer === 'yes',
-        returnDate: data.returnTransfer === 'yes' ? data.returnDate : null,
-        returnTime: data.returnTransfer === 'yes' ? data.returnTime : null,
-        comments: data.comments,
-        vehicleId: vehicleOptions.find(v => v.value === data.vehicleClass)?.vehicleId
+        destinationAddress: formValues.tellDriver ? '' : formValues.destinationAddress,
+        tellDriver: formValues.tellDriver,
+        paymentMethod: formValues.paymentMethod,
+        returnTransfer: formValues.returnTransfer === 'yes',
+        returnDate: formValues.returnTransfer === 'yes' ? formValues.returnDate : null,
+        returnTime: formValues.returnTransfer === 'yes' ? formValues.returnTime : null,
+        comments: formValues.comments,
+        vehicleId: vehicleOptions.find(v => v.value === formValues.vehicleClass)?.vehicleId
       };
 
       // Отправляем запрос в API
@@ -313,6 +409,7 @@ export default function BookingForm() {
       // Очищаем форму при успешной отправке
       form.reset();
       setIsSuccess(true);
+      setShowConfirmation(false);
       toast.success('Заявка успешно отправлена! Мы свяжемся с вами в ближайшее время.');
 
       // Закрываем модальное окно после небольшой задержки
@@ -326,7 +423,12 @@ export default function BookingForm() {
     } finally {
       setIsSubmitting(false);
     }
-  }
+  };
+
+  // Отмена подтверждения
+  const cancelConfirmation = () => {
+    setShowConfirmation(false);
+  };
 
   const vehicleOptions = transferConfig?.vehicles || [];
 
@@ -336,6 +438,18 @@ export default function BookingForm() {
       <div className="flex justify-center items-center min-h-[300px]">
         <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-500"></div>
       </div>
+    );
+  }
+
+  // Отображение модального окна подтверждения
+  if (showConfirmation && formValues) {
+    return (
+      <ConfirmationModal
+        formData={formValues}
+        vehicleOptions={vehicleOptions}
+        onConfirm={confirmOrder}
+        onCancel={cancelConfirmation}
+      />
     );
   }
 

@@ -23,32 +23,66 @@ export async function GET() {
 // POST /api/application-requests - создание новой заявки
 export async function POST(request: Request) {
   try {
+    // Проверяем подключение к базе данных
+    await prisma.$connect();
+
     const data = await request.json()
 
-    // Валидация
-    if (!data.name || !data.phone || !data.contactMethod) {
+    // Дополнительная проверка данных
+    if (!data.name) {
       return NextResponse.json(
-        { error: 'Не все обязательные поля заполнены' },
+        { error: 'Имя обязательно для заполнения' },
         { status: 400 }
       )
     }
 
-    // Создание заявки
-    const newRequest = await prisma.applicationRequest.create({
-      data: {
-        name: data.name,
-        phone: data.phone,
-        contactMethod: data.contactMethod,
-      },
-    })
+    if (!data.phone) {
+      return NextResponse.json(
+        { error: 'Телефон обязателен для заполнения' },
+        { status: 400 }
+      )
+    }
 
-    return NextResponse.json({ success: true, request: newRequest })
+    if (!data.contactMethod) {
+      return NextResponse.json(
+        { error: 'Способ связи обязателен для заполнения' },
+        { status: 400 }
+      )
+    }
+
+    // Создание заявки с обработкой возможных ошибок Prisma
+    try {
+      const newRequest = await prisma.applicationRequest.create({
+        data: {
+          name: data.name,
+          phone: data.phone,
+          contactMethod: data.contactMethod,
+          status: 'new'
+        },
+      })
+
+      console.log('Заявка успешно создана:', newRequest);
+
+      return NextResponse.json({
+        success: true,
+        request: newRequest
+      });
+    } catch (prismaError) {
+      console.error('Ошибка Prisma при создании заявки:', prismaError)
+      return NextResponse.json(
+        { error: 'Ошибка базы данных при создании заявки' },
+        { status: 500 }
+      )
+    }
   } catch (error) {
     console.error('Error creating application request:', error)
     return NextResponse.json(
       { error: 'Не удалось создать заявку' },
       { status: 500 }
     )
+  } finally {
+    // Отключаемся от базы данных
+    await prisma.$disconnect();
   }
 }
 

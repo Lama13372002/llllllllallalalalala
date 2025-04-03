@@ -408,53 +408,28 @@ export default function BookingForm() {
               control={form.control}
               name="vehicleClass"
               render={({ field }) => (
-                <FormItem className="space-y-4">
+                <FormItem>
                   <FormLabel>Класс автомобиля</FormLabel>
-                  <FormControl>
-                    <RadioGroup
-                      onValueChange={field.onChange}
-                      defaultValue={field.value}
-                      className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4"
-                    >
+                  <Select
+                    onValueChange={field.onChange}
+                    defaultValue={field.value}
+                  >
+                    <FormControl>
+                      <SelectTrigger className="form-input-focus">
+                        <SelectValue placeholder="Выберите класс автомобиля" />
+                      </SelectTrigger>
+                    </FormControl>
+                    <SelectContent>
                       {vehicleOptions.map((option) => (
-                        <Card key={option.value} className={cn("cursor-pointer transition-all border-2 h-full",
-                          field.value === option.value ? "border-primary" : "hover:border-gray-300")}>
-                          <label
-                            htmlFor={`vehicle-${option.value}`}
-                            className="cursor-pointer block h-full"
-                          >
-                            <CardContent className="p-0 h-full flex flex-col">
-                              <div className="relative aspect-video w-full overflow-hidden">
-                                <div
-                                  className="absolute inset-0 bg-cover bg-center"
-                                  style={{ backgroundImage: `url(${option.image})` }}
-                                />
-                                <div className="absolute inset-0 bg-black/30 flex items-center justify-center">
-                                  <Car className="h-12 w-12 text-white/80" />
-                                </div>
-                                <div className="absolute top-2 right-2 bg-primary/90 text-white text-xs px-2 py-1 rounded-full">
-                                  {option.price}
-                                </div>
-                              </div>
-                              <div className="p-4 flex-grow">
-                                <div className="flex flex-col h-full">
-                                  <div>
-                                    <h3 className="font-medium text-sm md:text-base">{option.label}</h3>
-                                    <p className="text-xs text-muted-foreground">{option.desc}</p>
-                                  </div>
-                                  <RadioGroupItem
-                                    value={option.value}
-                                    id={`vehicle-${option.value}`}
-                                    className="sr-only"
-                                  />
-                                </div>
-                              </div>
-                            </CardContent>
-                          </label>
-                        </Card>
+                        <SelectItem key={option.value} value={option.value}>
+                          <div className="flex items-center">
+                            <span className="mr-2">{option.label}</span>
+                            <span className="text-xs text-gray-500">({option.price})</span>
+                          </div>
+                        </SelectItem>
                       ))}
-                    </RadioGroup>
-                  </FormControl>
+                    </SelectContent>
+                  </Select>
                   <FormMessage />
                 </FormItem>
               )}

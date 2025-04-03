@@ -198,3 +198,14 @@ model HomeSettings {
   feature3Icon      String   @default("Check") @db.VarChar(50)
   updatedAt         DateTime @updatedAt
 }
+
+// Модель для хранения заявок с формы "Оставить заявку"
+model ApplicationRequest {
+  id              Int       @id @default(autoincrement())
+  name            String
+  phone           String
+  contactMethod   String    // "telegram", "whatsapp", "call" - способ связи
+  status          String    @default("new")
+  createdAt       DateTime  @default(now())
+  updatedAt       DateTime  @updatedAt
+}

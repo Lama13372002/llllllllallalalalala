@@ -36,7 +36,12 @@ const formSchema = z.object({
   }),
 })
 
-export default function ApplicationForm() {
+// Тип пропсов для компонента
+interface ApplicationFormProps {
+  onClose?: () => void;
+}
+
+export default function ApplicationForm({ onClose }: ApplicationFormProps = {}) {
   const { settings } = useSettings()
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [isSuccess, setIsSuccess] = useState(false)
@@ -53,15 +58,30 @@ export default function ApplicationForm() {
     },
   })
 
+  // Функция для закрытия диалога
+  const closeDialog = () => {
+    if (onClose) {
+      onClose();
+    } else {
+      // Запасной вариант закрытия, если не передан onClose
+      document.querySelector('[role="dialog"]')?.closest('div[data-state="open"]')?.dispatchEvent(
+        new KeyboardEvent('keydown', {key: 'Escape'})
+      );
+    }
+  };
+
   // Функция для переключения выбора контактного метода
   const toggleContactMethod = (value: string) => {
     const currentValue = form.getValues().contactMethod;
     if (currentValue === value) {
       // Если текущее значение совпадает с выбранным, сбрасываем его
-      form.setValue('contactMethod', undefined);
+      form.setValue('contactMethod', undefined as any);
+      // Нужно обновить состояние формы, чтобы отразить изменение
+      form.trigger('contactMethod');
     } else {
       // Иначе устанавливаем новое значение
       form.setValue('contactMethod', value as 'telegram' | 'whatsapp' | 'call');
+      form.trigger('contactMethod');
     }
   };
 
@@ -87,7 +107,13 @@ export default function ApplicationForm() {
         body: JSON.stringify(data),
       })
 
-      const result = await response.json()
+      let result;
+      try {
+        result = await response.json();
+      } catch (e) {
+        console.error('Ошибка при парсинге JSON ответа:', e);
+        throw new Error('Ошибка при обработке ответа от сервера');
+      }
 
       if (!response.ok) {
         throw new Error(result.error || 'Ошибка при отправке формы')
@@ -100,16 +126,27 @@ export default function ApplicationForm() {
 
       // Закрываем модальное окно после небольшой задержки
       setTimeout(() => {
-        document.querySelector('[role="dialog"]')?.closest('div[data-state="open"]')?.dispatchEvent(new KeyboardEvent('keydown', {key: 'Escape'}))
+        closeDialog();
       }, 3000)
     } catch (error) {
       console.error('Ошибка при отправке формы:', error)
-      setError('Произошла ошибка при отправке формы. Пожалуйста, попробуйте еще раз позже.')
+      setError(error instanceof Error ? error.message : 'Произошла ошибка при отправке формы. Пожалуйста, попробуйте еще раз позже.')
       toast.error('Ошибка при отправке формы. Пожалуйста, попробуйте еще раз позже.')
     } finally {
       setIsSubmitting(false)
     }
   }
+
+  // Проверка наличия ошибок в форме
+  useEffect(() => {
+    const subscription = form.watch(() => {
+      if (Object.keys(form.formState.errors).length > 0) {
+        console.log('Ошибки формы:', form.formState.errors);
+      }
+    });
+
+    return () => subscription.unsubscribe();
+  }, [form.watch, form.formState.errors]);
 
   return (
     <div className="relative max-h-[90vh] overflow-y-auto pb-20">
@@ -119,7 +156,9 @@ export default function ApplicationForm() {
           variant="ghost"
           size="icon"
           className="rounded-full"
-          onClick={() => document.querySelector('[role="dialog"]')?.closest('div[data-state="open"]')?.dispatchEvent(new KeyboardEvent('keydown', {key: 'Escape'}))}
+          onClick={closeDialog}
+          type="button"
+          aria-label="Закрыть"
         >
           <X className="h-4 w-4" />
           <span className="sr-only">Закрыть</span>
@@ -186,6 +225,7 @@ export default function ApplicationForm() {
                           onValueChange={field.onChange}
                           value={field.value}
                           className="grid grid-cols-1 sm:grid-cols-3 gap-4"
+                          aria-label="Предпочтительный способ связи"
                         >
                           <label
                             htmlFor="contact-telegram"

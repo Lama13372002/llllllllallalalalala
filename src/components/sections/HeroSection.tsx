@@ -7,6 +7,7 @@ import { Button } from '@/components/ui/button'
 import { Dialog, DialogContent, DialogTrigger } from '@/components/ui/dialog'
 import { MapPin, Clock, Check } from 'lucide-react'
 import BookingForm from '@/components/forms/BookingForm'
+import ApplicationForm from '@/components/forms/ApplicationForm'
 import { useHomeSettings } from '@/lib/home-settings-context'
 
 // Функция для выбора иконки по названию
@@ -26,6 +27,7 @@ const getIcon = (iconName: string, className: string) => {
 export default function HeroSection() {
   const { homeSettings } = useHomeSettings();
   const [isBookingOpen, setIsBookingOpen] = useState(false);
+  const [isApplicationOpen, setIsApplicationOpen] = useState(false);
 
   // Animation variants
   const containerVariants = {
@@ -87,9 +89,20 @@ export default function HeroSection() {
             className="flex flex-col sm:flex-row gap-4 mb-12"
             variants={itemVariants}
           >
-            <Dialog open={isBookingOpen} onOpenChange={setIsBookingOpen}>
+            <Dialog open={isApplicationOpen} onOpenChange={setIsApplicationOpen}>
               <DialogTrigger asChild>
                 <Button size="lg" className="btn-gradient text-white text-lg font-medium animate-pulse">
+                  Оставить заявку
+                </Button>
+              </DialogTrigger>
+              <DialogContent className="sm:max-w-[625px] p-0 overflow-hidden">
+                <ApplicationForm />
+              </DialogContent>
+            </Dialog>
+
+            <Dialog open={isBookingOpen} onOpenChange={setIsBookingOpen}>
+              <DialogTrigger asChild>
+                <Button size="lg" variant="outline" className="text-white text-lg font-medium hover:bg-white/10">
                   Заказать трансфер
                 </Button>
               </DialogTrigger>

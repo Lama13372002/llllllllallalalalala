@@ -29,6 +29,11 @@ export default function HeroSection() {
   const [isBookingOpen, setIsBookingOpen] = useState(false);
   const [isApplicationOpen, setIsApplicationOpen] = useState(false);
 
+  // Функция для открытия диалога заявки
+  const openApplicationDialog = () => {
+    setIsApplicationOpen(true);
+  };
+
   // Animation variants
   const containerVariants = {
     hidden: { opacity: 0 },
@@ -91,13 +96,17 @@ export default function HeroSection() {
           >
             <Dialog open={isApplicationOpen} onOpenChange={setIsApplicationOpen}>
               <DialogTrigger asChild>
-                <Button size="lg" className="btn-gradient text-white text-lg font-medium animate-pulse">
+                <Button
+                  size="lg"
+                  className="btn-gradient text-white text-lg font-medium animate-pulse"
+                  onClick={openApplicationDialog}
+                >
                   Оставить заявку
                 </Button>
               </DialogTrigger>
-              <DialogContent className="sm:max-w-[625px] p-0 overflow-hidden">
+              <DialogContent className="sm:max-w-[625px] p-0 overflow-hidden" onEscapeKeyDown={() => setIsApplicationOpen(false)}>
                 <DialogTitle className="sr-only">Оставить заявку</DialogTitle>
-                <ApplicationForm />
+                <ApplicationForm onClose={() => setIsApplicationOpen(false)} />
               </DialogContent>
             </Dialog>
           </motion.div>

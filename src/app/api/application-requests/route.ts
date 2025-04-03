@@ -22,67 +22,54 @@ export async function GET() {
 
 // POST /api/application-requests - создание новой заявки
 export async function POST(request: Request) {
+  console.log('POST request to /api/application-requests received');
+
   try {
-    // Проверяем подключение к базе данных
-    await prisma.$connect();
+    const data = await request.json();
+    console.log('Request data:', data);
 
-    const data = await request.json()
-
-    // Дополнительная проверка данных
-    if (!data.name) {
+    // Базовая валидация
+    if (!data.name || !data.phone || !data.contactMethod) {
+      console.error('Validation error - missing required fields');
       return NextResponse.json(
-        { error: 'Имя обязательно для заполнения' },
+        { error: 'Не все обязательные поля заполнены' },
         { status: 400 }
-      )
+      );
     }
 
-    if (!data.phone) {
-      return NextResponse.json(
-        { error: 'Телефон обязателен для заполнения' },
-        { status: 400 }
-      )
+    // Создание заявки напрямую, без вложенных try/catch
+    const newRequest = await prisma.applicationRequest.create({
+      data: {
+        name: data.name,
+        phone: data.phone,
+        contactMethod: data.contactMethod,
+        status: 'new'
+      },
+    });
+
+    console.log('ApplicationRequest created successfully:', newRequest);
+
+    return NextResponse.json({
+      success: true,
+      request: newRequest
+    });
+
+  } catch (error: any) {
+    console.error('Error creating application request:', error);
+
+    // Детальное логирование для диагностики
+    if (error.code) {
+      console.error('Prisma error code:', error.code);
     }
 
-    if (!data.contactMethod) {
-      return NextResponse.json(
-        { error: 'Способ связи обязателен для заполнения' },
-        { status: 400 }
-      )
+    if (error.meta) {
+      console.error('Prisma error metadata:', error.meta);
     }
 
-    // Создание заявки с обработкой возможных ошибок Prisma
-    try {
-      const newRequest = await prisma.applicationRequest.create({
-        data: {
-          name: data.name,
-          phone: data.phone,
-          contactMethod: data.contactMethod,
-          status: 'new'
-        },
-      })
-
-      console.log('Заявка успешно создана:', newRequest);
-
-      return NextResponse.json({
-        success: true,
-        request: newRequest
-      });
-    } catch (prismaError) {
-      console.error('Ошибка Prisma при создании заявки:', prismaError)
-      return NextResponse.json(
-        { error: 'Ошибка базы данных при создании заявки' },
-        { status: 500 }
-      )
-    }
-  } catch (error) {
-    console.error('Error creating application request:', error)
     return NextResponse.json(
-      { error: 'Не удалось создать заявку' },
+      { error: 'Не удалось создать заявку: ' + (error.message || 'Неизвестная ошибка сервера') },
       { status: 500 }
-    )
-  } finally {
-    // Отключаемся от базы данных
-    await prisma.$disconnect();
+    );
   }
 }
 

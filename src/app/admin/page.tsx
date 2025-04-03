@@ -17,9 +17,10 @@ import RoutesList from '@/components/forms/RoutesList'
 import TransferConfigList from '@/components/forms/TransferConfigList'
 import TransferRequestsList from '@/components/forms/TransferRequestsList'
 import ContactRequestsList from '@/components/forms/ContactRequestsList'
+import ApplicationRequestsList from '@/components/forms/ApplicationRequestsList'
 import LogoSettingsForm from '@/components/forms/LogoSettingsForm'
 import HomeSettingsForm from '@/components/forms/HomeSettingsForm'
-import { LayoutGrid, FileText, Phone, Mail, Share2, Award, MessageSquare, Car, Map, Home, Image as ImageIcon, Inbox, MessageCircle } from 'lucide-react'
+import { LayoutGrid, FileText, Phone, Mail, Share2, Award, MessageSquare, Car, Map, Home, Image as ImageIcon, Inbox, MessageCircle, FileQuestion } from 'lucide-react'
 
 // Компонент, который использует useSearchParams и обернут в Suspense
 function AdminContent() {
@@ -163,6 +164,10 @@ function AdminContent() {
               <TabsTrigger value="contact-requests" className="flex items-center text-xs sm:text-sm py-1.5 sm:py-2 px-2 sm:px-3">
                 <MessageCircle className="w-3 h-3 sm:w-4 sm:h-4 mr-1 sm:mr-2 flex-shrink-0" />
                 <span>Заявки со связи</span>
+              </TabsTrigger>
+              <TabsTrigger value="application-requests" className="flex items-center text-xs sm:text-sm py-1.5 sm:py-2 px-2 sm:px-3">
+                <FileQuestion className="w-3 h-3 sm:w-4 sm:h-4 mr-1 sm:mr-2 flex-shrink-0" />
+                <span>Заявки с формы</span>
               </TabsTrigger>
             </TabsList>
           </div>
@@ -388,6 +393,10 @@ function AdminContent() {
 
           <TabsContent value="contact-requests">
             <ContactRequestsList />
+          </TabsContent>
+
+          <TabsContent value="application-requests">
+            <ApplicationRequestsList />
           </TabsContent>
 
           <TabsContent value="logos">

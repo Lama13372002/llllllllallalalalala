@@ -4,7 +4,7 @@ import { useState } from 'react'
 import Image from 'next/image'
 import { motion } from 'framer-motion'
 import { Button } from '@/components/ui/button'
-import { Dialog, DialogContent, DialogTrigger, DialogTitle } from '@/components/ui/dialog'
+import { Dialog, DialogContent, DialogTrigger, DialogTitle, DialogDescription } from '@/components/ui/dialog'
 import { MapPin, Clock, Check } from 'lucide-react'
 import BookingForm from '@/components/forms/BookingForm'
 import ApplicationForm from '@/components/forms/ApplicationForm'
@@ -104,8 +104,15 @@ export default function HeroSection() {
                   Оставить заявку
                 </Button>
               </DialogTrigger>
-              <DialogContent className="sm:max-w-[625px] p-0 overflow-hidden" onEscapeKeyDown={() => setIsApplicationOpen(false)}>
+              <DialogContent
+                className="sm:max-w-[625px] p-0 overflow-hidden"
+                onEscapeKeyDown={() => setIsApplicationOpen(false)}
+                aria-describedby="application-form-description"
+              >
                 <DialogTitle className="sr-only">Оставить заявку</DialogTitle>
+                <DialogDescription id="application-form-description" className="sr-only">
+                  Заполните форму заявки для связи с нами
+                </DialogDescription>
                 <ApplicationForm onClose={() => setIsApplicationOpen(false)} />
               </DialogContent>
             </Dialog>

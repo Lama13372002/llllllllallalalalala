@@ -1,5 +1,3 @@
-'use client'
-
 import { PrismaClient } from '@prisma/client'
 
 // Глобальная переменная для поддержки единственного экземпляра

@@ -36,6 +36,7 @@ type Vehicle = {
   description: string | null
   imageUrl: string | null
   amenities: string | null
+  price: number | null
   isActive: boolean
   createdAt: string
   updatedAt: string
@@ -57,6 +58,7 @@ export default function VehiclesList() {
     description: '',
     imageUrl: '',
     amenities: '',
+    price: null as number | null,
     isActive: true
   })
 
@@ -140,6 +142,7 @@ export default function VehiclesList() {
             description: formData.description,
             imageUrl: formData.imageUrl,
             amenities: formData.amenities,
+            price: formData.price,
             isActive: formData.isActive
           })
         })
@@ -159,6 +162,7 @@ export default function VehiclesList() {
             description: formData.description,
             imageUrl: formData.imageUrl,
             amenities: formData.amenities,
+            price: formData.price,
             isActive: formData.isActive
           })
         })
@@ -223,6 +227,7 @@ export default function VehiclesList() {
       description: vehicle.description || '',
       imageUrl: vehicle.imageUrl || '',
       amenities: vehicle.amenities || '',
+      price: vehicle.price,
       isActive: vehicle.isActive
     })
 
@@ -247,6 +252,7 @@ export default function VehiclesList() {
       description: '',
       imageUrl: '',
       amenities: '',
+      price: null,
       isActive: true
     })
     setAmenitiesList([])
@@ -317,6 +323,11 @@ export default function VehiclesList() {
                     <Users className="w-3 h-3 mr-1" />
                     {vehicle.seats} мест
                   </span>
+                  {vehicle.price !== null && (
+                    <span className="inline-flex items-center px-2 py-1 rounded-full bg-green-100 text-xs text-green-800">
+                      {vehicle.price} EUR
+                    </span>
+                  )}
                   {!vehicle.isActive && (
                     <span className="inline-flex items-center px-2 py-1 rounded-full bg-red-100 text-xs text-red-800">
                       Неактивно
@@ -438,14 +449,30 @@ export default function VehiclesList() {
                 />
               </div>
               <div>
-                <label className="block text-sm font-medium mb-1">URL изображения</label>
+                <label className="block text-sm font-medium mb-1">Цена (EUR)</label>
                 <Input
-                  name="imageUrl"
-                  value={formData.imageUrl}
-                  onChange={handleChange}
-                  placeholder="https://example.com/image.jpg"
+                  name="price"
+                  type="number"
+                  value={formData.price === null ? '' : formData.price}
+                  onChange={(e) => {
+                    const value = e.target.value === '' ? null : parseFloat(e.target.value);
+                    setFormData(prev => ({ ...prev, price: value }));
+                  }}
+                  placeholder="Например: 250.00"
+                  step="0.01"
+                  min="0"
                 />
               </div>
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium mb-1">URL изображения</label>
+              <Input
+                name="imageUrl"
+                value={formData.imageUrl}
+                onChange={handleChange}
+                placeholder="https://example.com/image.jpg"
+              />
             </div>
 
             <div>

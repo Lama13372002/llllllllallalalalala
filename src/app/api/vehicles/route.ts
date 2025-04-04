@@ -44,6 +44,7 @@ export async function POST(request: Request) {
         description: body.description || null,
         imageUrl: body.imageUrl || null,
         amenities: body.amenities || null,
+        price: body.price !== undefined ? body.price : null,
         isActive: body.isActive !== undefined ? body.isActive : true
       }
     })
@@ -77,6 +78,7 @@ export async function PUT(request: Request) {
         description: body.description !== undefined ? body.description : undefined,
         imageUrl: body.imageUrl !== undefined ? body.imageUrl : undefined,
         amenities: body.amenities !== undefined ? body.amenities : undefined,
+        price: body.price !== undefined ? body.price : undefined,
         isActive: body.isActive !== undefined ? body.isActive : undefined
       }
     })

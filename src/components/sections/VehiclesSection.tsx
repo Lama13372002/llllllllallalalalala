@@ -31,6 +31,7 @@ type DBVehicle = {
   description: string | null
   imageUrl: string | null
   amenities: string | null
+  price: number | null
   isActive: boolean
 }
 
@@ -195,8 +196,10 @@ export default function VehiclesSection() {
     // Получаем изображение по умолчанию для данного класса или общее значение по умолчанию
     const fallbackImage = defaultImages[vehicleClass] || defaultImages.default
 
-    // Получаем цену по умолчанию для данного класса или общее значение по умолчанию
-    const price = defaultPrices[vehicleClass] || defaultPrices.default
+    // Получаем цену из базы данных или по умолчанию для данного класса
+    const price = dbVehicle.price !== null
+      ? `${dbVehicle.price.toFixed(2)} EUR`
+      : defaultPrices[vehicleClass] || defaultPrices.default
 
     // Разбираем строку с удобствами из БД, если она есть
     const features = dbVehicle.amenities
@@ -254,6 +257,7 @@ export default function VehiclesSection() {
               description: 'Комфортабельный автомобиль стандартного класса для городских поездок.',
               imageUrl: null,
               amenities: 'Кондиционер;Wi-Fi;Бутилированная вода;Зарядные устройства',
+              price: 250,
               isActive: true
             },
             {
@@ -266,6 +270,7 @@ export default function VehiclesSection() {
               description: 'Просторный автомобиль комфорт-класса с увеличенным пространством для ног.',
               imageUrl: null,
               amenities: 'Климат-контроль;Wi-Fi;Бутилированная вода;Большой багажник',
+              price: 250,
               isActive: true
             },
             {
@@ -278,6 +283,7 @@ export default function VehiclesSection() {
               description: 'Престижный автомобиль бизнес-класса для деловых поездок и встреч.',
               imageUrl: null,
               amenities: 'Кожаный салон;Мультизонный климат-контроль;Wi-Fi;Мини-бар',
+              price: 350,
               isActive: true
             },
             {
@@ -290,6 +296,7 @@ export default function VehiclesSection() {
               description: 'Эксклюзивный автомобиль представительского класса для особых случаев.',
               imageUrl: null,
               amenities: 'Эксклюзивный кожаный салон;Интеллектуальный климат-контроль;Wi-Fi высокоскоростной;Персональный мини-бар',
+              price: 500,
               isActive: true
             },
             {
@@ -302,6 +309,7 @@ export default function VehiclesSection() {
               description: 'Просторный минивэн для комфортной поездки большой группы до 7 человек.',
               imageUrl: null,
               amenities: 'Просторный салон;Климат-контроль;Wi-Fi;Большое багажное отделение',
+              price: 500,
               isActive: true
             }
           ];
@@ -579,7 +587,7 @@ export default function VehiclesSection() {
                         animationDuration: '3s'
                       }}
                     >
-                      <div className={`absolute inset-0 opacity-30 bg-gradient-to-t ${gradient}`}></div>
+                      <div className="absolute inset-0 opacity-30 bg-gray-500"></div>
                     </div>
                     <div className="absolute top-4 right-4 bg-primary/90 text-white px-3 py-1 rounded-full text-sm font-medium backdrop-blur-sm shadow-lg transform hover:scale-105 transition-transform">
                       {currentVehicle.price}
@@ -682,7 +690,7 @@ export default function VehiclesSection() {
                           animationDuration: '3s'
                         }}
                       >
-                        <div className={`absolute inset-0 opacity-30 bg-gradient-to-t ${gradient}`}></div>
+                        <div className="absolute inset-0 opacity-30 bg-gray-500"></div>
                       </div>
                       <div className="absolute top-4 right-4 bg-primary/90 text-white px-3 py-1 rounded-full text-sm font-medium backdrop-blur-sm shadow-lg transform hover:scale-105 transition-transform">
                         {currentVehicle.price}
